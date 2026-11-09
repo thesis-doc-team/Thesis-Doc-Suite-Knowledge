@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 文本编排工具 · 会议纪要汇总（第 1–5 次）</title>
+<style>
+  :root{
+    --bg:#fbfaf6; --card:#ffffff; --ink:#1b2430; --ink2:#3f4c5a; --ink3:#6b7885;
+    --teal:#0f7566; --teal-soft:#e7f2ef;
+    --amber:#b0631c; --amber-soft:#faf0e2;
+    --blue:#2b5876; --blue-soft:#eaf0f4;
+    --red:#a4372c; --red-soft:#fbeceb;
+    --line:#e2ded4;
+    --shadow:0 1px 2px rgba(27,36,48,.05),0 8px 24px -16px rgba(27,36,48,.25);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    line-height:1.75; font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:72px 0 40px}
+  .kicker{
+    display:flex;align-items:center;gap:12px;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--teal);font-weight:600;
+  }
+  .kicker::before{content:"";display:inline-block;width:26px;height:2px;background:var(--teal)}
+  .hero h1{font-size:34px;line-height:1.3;margin:16px 0 14px;letter-spacing:.01em}
+  .hero p.lede{color:var(--ink2);max-width:760px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:6px 14px;font-size:13px;color:var(--ink2);box-shadow:var(--shadow);
+  }
+  .chip b{color:var(--teal);font-variant-numeric:tabular-nums}
+
+  /* ---------- TOC ---------- */
+  .toc{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,250,246,.82);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+  .toc-inner{
+    max-width:1120px;margin:0 auto;padding:10px 24px;
+    display:flex;gap:8px;overflow-x:auto;white-space:nowrap;
+  }
+  .toc a{
+    flex:0 0 auto;text-decoration:none;font-size:13px;color:var(--ink2);
+    padding:5px 12px;border-radius:999px;border:1px solid transparent;
+    transition:all .15s ease;
+  }
+  .toc a:hover{color:var(--teal);background:var(--teal-soft);border-color:var(--teal-soft)}
+
+  /* ---------- Sections ---------- */
+  section.meeting{padding:56px 0 8px;scroll-margin-top:64px}
+  .sec-head{display:flex;align-items:baseline;gap:18px;border-bottom:2px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  .sec-num{
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;
+    font-size:40px;font-weight:700;color:var(--teal);line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .sec-head h2{font-size:24px;line-height:1.35}
+  .sec-meta{margin:10px 0 28px;color:var(--ink3);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 20px}
+  .sec-meta span b{color:var(--ink2);font-weight:600}
+
+  h3.block-title{
+    font-size:15px;color:var(--ink);margin:30px 0 14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h3.block-title::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--teal)}
+
+  /* 摘要 callout */
+  .callout{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);
+    border-radius:12px;padding:18px 22px;box-shadow:var(--shadow);
+    color:var(--ink2);
+  }
+
+  /* 议题卡片网格 */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;box-shadow:var(--shadow);
+  }
+  .card h4{font-size:15px;margin-bottom:10px;color:var(--ink)}
+  .card h4 .tag{
+    display:inline-block;font-size:11px;color:var(--teal);background:var(--teal-soft);
+    border-radius:6px;padding:1px 8px;margin-right:8px;vertical-align:2px;
+    font-variant-numeric:tabular-nums;
+  }
+  .card ul{list-style:none}
+  .card li{position:relative;padding-left:16px;margin:8px 0;color:var(--ink2);font-size:14px}
+  .card li::before{content:"";position:absolute;left:0;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--line)}
+  .card li b{color:var(--ink)}
+
+  /* 待办表格 */
+  .table-card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{
+    text-align:left;font-size:12px;letter-spacing:.08em;color:var(--ink3);
+    background:#f5f3ec;padding:10px 18px;border-bottom:1px solid var(--line);font-weight:600;
+  }
+  td{padding:12px 18px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.idx{font-variant-numeric:tabular-nums;color:var(--ink3);width:52px}
+  .owner{
+    display:inline-block;font-size:12px;font-weight:600;border-radius:999px;
+    padding:2px 10px;margin:1px 4px 1px 0;white-space:nowrap;
+  }
+  .o-teal{color:var(--teal);background:var(--teal-soft)}
+  .o-blue{color:var(--blue);background:var(--blue-soft)}
+  .o-amber{color:var(--amber);background:var(--amber-soft)}
+  .o-red{color:var(--red);background:var(--red-soft)}
+  .o-slate{color:var(--ink2);background:#eef0f2}
+
+  /* 实录 timeline */
+  details.transcript{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  details.transcript summary{
+    cursor:pointer;list-style:none;padding:16px 22px;
+    font-weight:600;color:var(--teal);display:flex;align-items:center;gap:10px;
+    user-select:none;
+  }
+  details.transcript summary::-webkit-details-marker{display:none}
+  details.transcript summary::before{
+    content:"▸";transition:transform .18s ease;color:var(--teal);font-size:13px;
+  }
+  details.transcript[open] summary::before{transform:rotate(90deg)}
+  details.transcript summary:hover{background:var(--teal-soft)}
+  .tl{padding:8px 22px 26px 22px}
+  .tl-item{position:relative;padding:0 0 22px 30px;border-left:2px solid var(--line)}
+  .tl-item:last-child{padding-bottom:4px}
+  .tl-item::before{
+    content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--teal);
+  }
+  .tl-time{
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;
+    font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;color:var(--teal);
+    display:block;margin-bottom:4px;
+  }
+  .tl-item p{color:var(--ink2);font-size:14px;margin:6px 0}
+  .tl-item p.dim{color:var(--ink3);font-size:13px}
+
+  /* 待办总览 */
+  section.overview{padding:56px 0 8px;scroll-margin-top:64px}
+  .badge-m{
+    display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .m-teal{color:var(--teal);background:var(--teal-soft)}
+  .m-blue{color:var(--blue);background:var(--blue-soft)}
+  .m-amber{color:var(--amber);background:var(--amber-soft)}
+  .m-red{color:var(--red);background:var(--red-soft)}
+  .m-slate{color:var(--ink2);background:#eef0f2}
+
+  footer{
+    margin-top:64px;border-top:1px solid var(--line);
+    padding:26px 0 48px;text-align:center;color:var(--ink3);font-size:12.5px;
+  }
+
+  @media (max-width:720px){
+    .hero{padding:48px 0 28px}
+    .hero h1{font-size:25px}
+    .grid{grid-template-columns:1fr}
+    .sec-num{font-size:30px}
+    .sec-head h2{font-size:19px}
+    td,th{padding:10px 12px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ Hero ============ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Meeting Minutes Archive</div>
+    <h1>AI 文本编排工具 · 会议纪要汇总（第 1–5 次）</h1>
+    <p class="lede">本页汇总了「AI 文本编排工具」项目前五次会议的完整纪要：从产品定位与排期、创业合规研讨，到架构设计、竞品研究与测试场景规划。每次会议均包含摘要、议题与结论、待办事项，以及可折叠展开的过程实录时间线。</p>
+    <div class="chips">
+      <span class="chip"><b>5</b> 次会议</span>
+      <span class="chip">发言人合集：邓淇 · 宁梓淇 · 嘘声 · 青禾 · 工网221江伊潭</span>
+      <span class="chip">待办总数 <b>24</b> 项</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ TOC ============ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#m1">会议① 项目方案与排期</a>
+    <a href="#m2">会议② 创业研讨</a>
+    <a href="#m3">会议③ 需求与差异化</a>
+    <a href="#m4">会议④ 架构与竞品</a>
+    <a href="#m5">会议⑤ 平台方案</a>
+    <a href="#overview">待办总览</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ 会议 1 ============ -->
+<section class="meeting" id="m1">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>项目方案与排期研讨</h2>
+  </div>
+  <div class="sec-meta">
+    <span>发言人：<b>邓淇、宁梓淇</b></span>
+    <span>实录时长：约 46 分钟</span>
+  </div>
+
+  <h3 class="block-title">会议摘要</h3>
+  <div class="callout">本次会议明确了产品的通用化定位与定制化交付逻辑，梳理了API兼容、文档引擎及竞品调研等核心开发需求，并同步了服务器部署与上线计划。</div>
+
+  <h3 class="block-title">议题与结论</h3>
+  <div class="grid">
+    <div class="card">
+      <h4><span class="tag">一</span>产品定位与交付逻辑</h4>
+      <ul>
+        <li><b>产品通用化定位：</b>转向通用型产品：当前产品定位过于局限，后续需重点开发通用型版本，不再限定特定学校或单位的专属模板，而是基于大规模检索生成通用排版。</li>
+        <li><b>定制化交付机制：</b>通用与定制双输出：系统先将项目作为黑盒，生成标准化的通用内容，随后基于用户输入的格式要求，由Agent进行二次加工，最终输出定制化文档。以用户要求为最高标准：若用户要求的格式比通用模板更简单，则优先交付用户要求的部分，同时附上补充建议供用户参考与修改。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">二</span>核心开发需求与排期</h4>
+      <ul>
+        <li><b>核心功能开发：</b>API平台兼容：需优先开发通用API Key转换平台，以兼容各类AI接口，解决测试难题及后续可能出现的接口失效或付费问题。文档引擎搭建：需搭建Word编排引擎，使Agent能够准确识别和处理PDF、Word等不同文档格式。PPT生成功能：新增PPT生成需求，计划参考PPT Master等开源框架，通过先生成HTML再截取的方式实现。</li>
+        <li><b>竞品调研与参考：</b>需寻找并汇总同类竞品平台的功能信息，评估其必要性，以便对现有产品功能进行补充与仿造。</li>
+        <li><b>文本技能升级：</b>六类文本优化：需优先完成现有六类文本的Skills升级，确保产品在小范围内能够正常使用。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">三</span>部署上线与运营推广</h4>
+      <ul>
+        <li><b>服务器部署与上线计划：</b>下周完成上线：计划购买服务器，预计在下周内完成产品部署与上线，并同步推进宣传视频的制作。</li>
+        <li><b>营销策略与团队扩充：</b>同步推进营销：在产品开发的同时，需同步思考并制定营销策略，因当前产品力受限，目前仅适合小范围推广。计划引入运营人员：考虑后续邀请具备较强运营能力的一谈加入团队，负责产品的营销推广工作。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="block-title">待办事项</h3>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>#</th><th>事项</th><th>负责人</th></tr></thead>
+      <tbody>
+        <tr><td class="idx">1</td><td>开发通用API Key转换平台，兼容各类AI接口。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">2</td><td>寻找并汇总竞品平台的功能信息，形成需求单。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td class="idx">3</td><td>升级六类文本的Skills，确保小范围可用。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td class="idx">4</td><td>搭建Word编排引擎，支持PDF和Word格式识别。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">5</td><td>购买服务器并部署产品，计划下周完成上线。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td class="idx">6</td><td>完成在线需求文档的编辑与权限配置，明确近期计划。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">7</td><td>下载并使用PPT Master，研究PPT生成功能。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">过程实录</h3>
+  <details class="transcript">
+    <summary>展开查看会议过程实录（约 23 条）</summary>
+    <div class="tl">
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">hi，我是你的元宝会议助手，我正在帮你实时记录会议纪要，请安心开会！</p></div>
+      <div class="tl-item"><span class="tl-time">05:42</span>
+        <p>宁梓淇与青禾在会议初期遭遇严重的音频设备故障，双方声音均出现严重卡顿与模糊，开局就因硬件拉胯卡了壳，直接把推进节奏按下了暂停键。</p>
+        <p>经短暂调试恢复基础收音后，青禾确认能听到声音但依然模糊，宁梓淇则决定更换设备重新接入以尝试解决，技术底子不稳，只能靠临时换设备来强行续命。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">09:38</span>
+        <p>宁梓淇更换设备后，双方确认音频恢复正常。随后，邓淇提议将会议内容重复一遍以完善记录，可见刚才的设备调试确实耽误了不少进度。</p>
+        <p>紧接着，邓淇同步了新建的需求文档与计划表，表示已通过微信发送，并强调该AI生成的文档目前完全够用，用AI快速产出初稿，主打一个先跑通流程再说。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">11:31</span>
+        <p>邓淇确认宁梓淇已收到 AI 生成的在线文档，明确该文档包含需求与计划双表，后续将作为统一记录需求与划分优先级的核心载体，用现成模板快速拉齐信息，省去了前期反复对齐的沟通成本。</p>
+        <p>针对宁梓淇关于“通用化”的设想，邓淇复述并确认了其意图，即剥离特定学校或单位属性，打造一套基于通用模板的项目拆解与资料填充方案，将定制化需求抽象为标准化模板，有效降低了后续的边际开发成本。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">14:59</span>
+        <p>邓淇提出先提供通用模板，待用户上传定制模板后，系统扫描并迁移至该模板，随后由Agent初审再交用户复核，这种“机器初筛加人工复核”的闭环，能有效降低最终交付的出错率。</p>
+        <p>随后，宁梓淇将流程简化为Agent直接加工交付。邓淇对此表示认同，并补充若用户已提前提供定制模板，则可跳过通用模板环节，直接点破了需求设计的冗余点，让流程逻辑变得更紧凑。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">16:45</span>
+        <p>针对用户要求少于标准模板的情况，宁梓淇担忧直接打包交付会导致内容缺失。邓淇提出以用户标准为准，将多余部分作为建议项供其选择，这招“基础交付+增值建议”既保了底，又留了灵活度。</p>
+        <p>随后，宁梓淇复述并确认了整体工作流：系统接收源码与格式要求，最终输出通用标准内容与定制化需求内容两部分，至此把产品逻辑彻底理顺，把模糊的边界敲成了硬标准。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">18:31</span>
+        <p>宁梓淇与邓淇对齐了“先生成通用内容，再按定制格式交付”的两步走策略。双方明确，系统需以用户要求为最高标准，结合知识库生成推荐内容供用户修改或替换，明确了用户需求永远是第一优先级。</p>
+        <p>随后，邓淇指出该方案不仅是满足定制需求，更重新定义了产品定位，将其从通用型工具转向可重复加工的定制化产品，这波探讨直接把工具属性拔高到了产品定位的层面。宁梓淇对此表示认同。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">20:20</span>
+        <p>邓淇坦言通用化重构缺乏经验且开发难度大，提议先搁置该方向，优先优化现有功能以加速上线，面对新方向的技术门槛，果断采取“先落地再升级”的务实策略。</p>
+        <p>随后，邓淇强调API通用平台优先级极高，指出这关乎调用量与计费风险，并需建立轮换机制，直接点破了底层依赖的脆弱性，规避了后期被供应商卡脖子的风险。宁梓淇对此完全认同。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">22:10</span>
+        <p>邓淇承诺为编排引擎提供参考资料供宁梓淇研究，先给参考再让研究，等于给了个方向，避免研发摸黑乱撞。</p>
+        <p>针对推广，邓淇直言当前产品受限于特定文体，只能小范围试水，需先做成通用产品才能支撑大规模推广，说白了就是现在的半成品撑不起大场面，得先练好内功再出门。</p>
+        <p>基于此，他建议前期先小投入测效果，并计划寻找竞品平台进行功能参考，先对标竞品再抄作业，这招能少走不少弯路。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">23:46</span>
+        <p>邓淇明确竞品策略为“功能仿造”而非“逆向工程”，因底层框架已成型，仅需在功能层面参考竞品，避开底层重构的坑，直接拿现成功能抄作业，主打一个省时省力。</p>
+        <p>随后，邓淇与宁梓淇敲定任务分工：宁梓淇负责通用平台的API Key转换，邓淇负责竞品调研与汇总需求，分工清晰且各取所长，把“做产品”和“找方向”的活儿彻底拆开了。</p>
+        <p>最后，邓淇重申了后续核心推进目标，强调需优先打磨好“六类文本”，并待API Key平台就绪后推进后续工作，可见当前核心诉求依然是先把基础功能做扎实。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">25:34</span>
+        <p>邓淇强调搭建Word引擎是后续通用功能的前提，并基于潜在的竞品压力，主张加快开发进度以实现尽早推广，这番话直指“时间就是金钱”，意在用抢跑策略建立先发壁垒。</p>
+        <p>随后，宁梓淇肯定了其重构后的宣传视频，并明确该视频旨在向意向用户展示产品全貌，可见两人对营销物料的定位高度一致，均看重其直观的获客转化能力。</p>
+        <p>基于此，邓淇确认当前宣传只能依赖该方案，宁梓淇则拍板决定近期同步推进宣传工作，研发与营销双线并进，整体节奏明显提速。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">27:19</span>
+        <p>针对产品上线，宁梓淇与邓淇敲定下周完成服务器部署，由邓淇采购服务器并提供访问链接，宁梓淇负责本地部署。前端开发基本完工，当前进度卡在服务器采购与部署环节，成了上线前的最后一道关卡。</p>
+        <p>随后，两人同步了进度表格，宁梓淇确认开发阶段已无大碍，仅剩三个新增的修改需求。紧接着，他盘点了待办，重点提及AI API兼容与多格式文档识别。核心功能已跑通，目前的工作重心正从“从零搭建”转向“查漏补缺”。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">29:11</span>
+        <p>宁梓淇与邓淇对齐了当前的三大开发需求，敲定第三项为参照竞品功能进行补充开发，并明确需同步推进营销策略与服务器部署工作，产品与运营双线并行，旨在避免技术跑通后陷入“无米下锅”的尴尬局面。</p>
+        <p>针对任务管理，邓淇提议按“重要且紧急”的矩阵维度进行分类。随后宁梓淇因缺乏在线表格的编辑权限受阻，邓淇排查并修复了权限问题，看似不起眼的权限小插曲，实则直接卡住了协同办公的推进节奏。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">30:56</span>
+        <p>宁梓淇与邓淇排查并解决了在线文档的编辑权限问题，邓淇解释系因权限设置逻辑导致，宁梓淇重新进入后确认恢复编辑能力。</p>
+        <p>随后，邓淇提议废弃重复的第一张表，直接采用第二张表按需求推进，宁梓淇迅速拍板同意，果断砍掉冗余环节，避免了无效的信息内耗。最终，邓淇确认了AI总结功能。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">32:46</span>
+        <p>宁梓淇与邓淇对齐了表格填写规范，邓淇建议直接复用上方需求，并明确将方案细节与验收环节的具体填写工作交由宁梓淇全权负责，明确了分工，后续推进由一方主导。</p>
+        <p>随后，邓淇提议若方案能落地，便将“他”拉入团队担任运营，两人顺势调侃起为其交社保和创收的话题，工作之余开起了玩笑，把拉人入伙说得轻松又接地气。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">34:30</span>
+        <p>邓淇明确计划于15号上线，宁梓淇随之确认“已有功能”仅为参考案例，并敲定直接基于案例进行修改，先对齐是案例还是真需求，免得做无用功。</p>
+        <p>随后，两人明确分工，宁梓淇负责修改需求方案表，邓淇接手填写竞品调研等后续内容，一个改方案，一个填调研，分工明确，推进得相当丝滑。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">36:14</span>
+        <p>宁梓淇与邓淇同步推进文档清理与内容填充，前者提议直接清空冗余内容，后者则确认会主动删除无用信息，两人对文档“做减法”的步调高度一致。</p>
+        <p>期间，邓淇对AI工具的高效总结赞不绝口，并顺势敲定交付排期，承诺后天（10号）提供成果，嘴上说着AI好用，手里活儿也一点没耽误。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">38:30</span>
+        <p>宁梓淇同步了近期功能开发进度，邓淇提议待竞品调研后再对齐“成长年度”功能的必要性，可见该功能的落地优先级仍有待商榷，需视竞品情况再做定夺。</p>
+        <p>随后，宁梓淇确认了文档自动保存功能，两人决定先补齐未完成的讨论内容，并着手优化文档命名，推进节奏相当务实，先填坑再统一规范。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">40:34</span>
+        <p>宁梓淇对邓淇所在学校开题进度之快表示惊讶，邓淇解释称开题无需返校即可完成，这波闲聊顺带摸清了对方的进度底牌。</p>
+        <p>随后，邓淇突然提议新增一个基于现成技术资料制作PPT的功能，思路相当跳跃，边聊边冒出新点子。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">42:12</span>
+        <p>宁梓淇同意增设PPT输出功能。随后，邓淇提出增加PPT等级修改功能，但因不熟悉AI单选设置暂无法落地，工具不熟直接卡住了需求推进。宁梓淇也表示不擅长表格操作。</p>
+        <p>宁梓淇提议拉入“一堂”协助出营销方案，邓淇起初以“用不上”和对方“开发捉襟见肘”为由婉拒，典型的“缺人又缺技术”的双重顾虑。最终经提醒，邓淇发现对方恰好能负责营销，顺势改口认可。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">43:55</span>
+        <p>针对联系同事的时间，宁梓淇提议等明天对方下班再说，但被邓淇以对方是“夜猫子”驳回，两人对同事作息的认知存在明显错位，一个以为早睡，一个深知其熬夜。</p>
+        <p>随后邓淇提及上月曾拉宁梓淇开会未果，宁梓淇对此表示毫不知情，这波信息差直接暴露出两人对近期会议安排的沟通存在盲区。</p>
+        <p>经宁梓淇追问，邓淇澄清当时的闲聊并未涉及当前方案，该想法是近期才萌生的，初衷是为解决招聘和论文的通用痛点，顺势补齐了项目背景，将当前方案的逻辑源头交代得明明白白。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">45:41</span>
+        <p>宁梓淇明确近两日先推进前两项需求，随后与邓淇对齐了PPT转HTML再截图的实现路径。邓淇顺势推荐“ppt master”供其参考，并强调该工具高度依赖模型能力，精准点破了技术落地的核心壁垒在于底层大模型。</p>
+        <p>就在宁梓淇准备结束会议去洗澡时，邓淇突然打断，表示此前提及的对接人刚刚回复了消息，原本准备散场的闲聊，因关键人物的及时回应瞬间拉回了工作正轨。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">44:07</span>
+        <p>宁梓淇表示要去洗澡，并打趣称打野是游戏里最憨的玩法。邓淇顺势提议先结束会议，前一秒还在聊PPT技术，下一秒直接切到洗澡和游戏，这波画风突转相当丝滑。</p>
+        <p>随后，邓淇主动提出先结束当前会议，并安排让另一位参会者稍作等待，这波安排相当干脆，主打一个“工作随时能停，洗澡不能耽误”。</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 会议 2 ============ -->
+<section class="meeting" id="m2">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>AI论文辅助工具创业研讨</h2>
+  </div>
+  <div class="sec-meta">
+    <span>发言人：<b>邓淇、嘘声、宁梓淇</b></span>
+    <span>实录时长：约 40 分钟</span>
+  </div>
+
+  <h3 class="block-title">会议摘要</h3>
+  <div class="callout">本次会议围绕AI论文辅助工具的开发进展、合规风险、目标客群及运营推广展开研讨，明确了产品转型方向，并制定了本周末上线首版及后续竞品调研的推进计划。</div>
+
+  <h3 class="block-title">议题与结论</h3>
+  <div class="grid">
+    <div class="card">
+      <h4><span class="tag">一</span>项目背景与当前进展</h4>
+      <ul>
+        <li><b>核心业务与产品定位：</b>AI文本编排工具：项目旨在开发一款基于AI Agent的通用文本编写工具，通过提取用户上传的资料或源码中的信息点，自动生成符合格式与逻辑规范的论文及汇报文本。开发进度与收费模式：当前整体开发进度约为60%至70%，核心框架已搭建完毕，计划于本周末前上线第一版本，后续将持续进行迭代与维护，并采用收费模式实现盈利。</li>
+        <li><b>底层架构规划：</b>API通用平台搭建：为解决单一API调用失败或超支的风险，计划搭建一个API通用平台作为后备，支持在调用异常时无缝切换至其他API继续服务。文档引擎模块拆分：计划将现有的Skill拆分为“信息拆解与组织”和“Word文本编排”两个独立模块，以适配平台化需求并支持通用模板的调用。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">二</span>合规风险与产品转型</h4>
+      <ul>
+        <li><b>业务合规风险预警：</b>直接代写存在违规风险：直接生成全套毕业设计文本属于灰色地带，若缺乏合规认证与备案，极易面临平台下架或法律风险。需完成合规备案：上线前必须完成网站备案及相关合规工作，以规避潜在的违规风险，确保业务能够合法合规地推进。</li>
+        <li><b>产品功能转型策略：</b>从交付成品转向信息编排：为规避违规风险，产品不再直接售卖成体系的文本成品，而是转型为提供通用的文件信息提取、格式排版与检验功能。基于用户模板进行填充：系统仅负责按照用户提供的模板和通用框架进行信息填充与排版，不直接涉及具体内容的代写，以此实现业务合规化。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">三</span>目标客群与产品优化</h4>
+      <ul>
+        <li><b>目标客群定位：</b>聚焦中低学历及不愿耗时群体：目标客户群体主要定位为不愿意花费大量时间折腾文本格式、倾向于寻求固定化套路的学生群体，而非高学历或熟练使用AI工具的学生。</li>
+        <li><b>需求表格优化建议：</b>增加用户视角列：当前的需求表格多为内部开发视角的专业术语，建议在表格中增加一列，以通俗易懂的语言向用户解释该功能的作用及能带来的利益。术语通俗化：避免使用“Skill”等用户难以理解的术语，应将其转化为“功能”等用户易于接受的词汇，降低用户的理解门槛。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">四</span>运营推广与竞品调研</h4>
+      <ul>
+        <li><b>推广渠道与策略：</b>初期试点与熟人裂变：初期推广计划从自身院校及老同学等熟人圈层切入，通过小范围试点测试产品效果并积累初始用户。线上自媒体引流：计划通过小红书等线上媒体平台进行自媒体推广，以合法合规的方式展示产品功能并吸引目标客群。</li>
+        <li><b>开源竞品调研：</b>调研GitHub现有项目：计划通过GitHub等平台调研市场上已有的类似开源项目，借鉴其功能逻辑以完善自身系统。规避开源协议风险：在参考开源项目功能时需注意保留私有代码，避免因闭源使用开源项目而引发协议纠纷或合规风险。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="block-title">待办事项</h3>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>#</th><th>事项</th><th>负责人</th></tr></thead>
+      <tbody>
+        <tr><td class="idx">1</td><td>本周末前完成第一版本的上线部署。</td><td><span class="owner o-teal">邓淇</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">2</td><td>在需求表格中增加一列，用于向用户解释功能作用及利益。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">3</td><td>调研GitHub等平台上的现有开源竞品，提取可借鉴的功能逻辑以完善系统。</td><td><span class="owner o-teal">邓淇</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">4</td><td>研究公域与私域流量的搭建方法及具体的引流推广方式。</td><td><span class="owner o-red">嘘声</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">过程实录</h3>
+  <details class="transcript">
+    <summary>展开查看会议过程实录（约 24 条）</summary>
+    <div class="tl">
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">hi，我是你的元宝会议助手，我正在帮你实时记录会议纪要，请安心开会！</p></div>
+      <div class="tl-item"><span class="tl-time">01:47</span>
+        <p>宁梓淇、邓淇与嘘声开启视频连线并调试设备，嘘声热情招呼后，催促对方尽快共享屏幕以展示内容，主打一个迫不及待想看大佬秀操作。</p>
+        <p>闲聊期间，嘘声对宁梓淇与邓淇的低成本创业尝试大加赞赏，宁梓淇则略带调侃地感慨即将上班的无奈，借着创业话题，把打工人对上班的怨念轻松化解。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">03:33</span>
+        <p>面对设备调试卡壳，宁梓淇果断接手电脑共享并接收文件，与邓淇敲定“先由他主讲，宁梓淇补充”的汇报分工，设备一卡壳，宁梓淇立马接盘，把进度稳稳兜住了。</p>
+        <p>邓淇正式介绍项目，明确原计划是做毕设文本生成网站，现经内部商议决定将其升级为通用工具，从毕设到通用工具，这波规划明显把格局拉高了。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">05:15</span>
+        <p>邓淇详细阐述了工作台系统的运作逻辑，用户上传文本或源码后，系统将调用agent提取核心信息点，这套“唯一信息源”机制，直接锁定了后续所有生成内容的标准，从源头规避了数据冲突的风险。随后，该信息点将作为唯一来源，用于生成任务书等六类文本。</p>
+        <p>针对生成文本的规范，邓淇明确了三大核心要求：统一格式、确保内容符合逻辑框架、精准筛选并生成图表，这三点要求直击用户“怕麻烦”的痛点，本质上是在用自动化能力替代人工排版与校验。图表处理上，系统将自动生成流程图、核心框架及三线表等。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">06:54</span>
+        <p>邓淇同步了项目进度，目前系统框架已搭建完毕，正致力于表格生成等细节研究，但项目暂未上线，仅有宣传视频产出，可见当前仍处于内部打磨期，离正式推向市场尚有一段距离。</p>
+        <p>鉴于项目未上线，邓淇向对方请教营销策略并抛出合伙邀请，期望对方入伙共同推进项目以实现经济收益，这波操作直击痛点，不仅借力解决营销短板，更用利益绑定了核心合伙人。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">08:39</span>
+        <p>邓淇向嘘声同步项目进度，确认当前开发已完成60%至70%，整体框架已成型但尚未上线，项目正处于从原型验证向正式平台过渡的关键爬坡期。</p>
+        <p>针对后续需求，邓淇计划搭建通用API平台作为备用，以防调用超支。同时，他决定将现有的文档引擎拆分为信息拆解与Word编排两个模块，将内部实验级功能重构为通用模板，旨在打破学校标准的局限，为平台化做铺垫。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">10:24</span>
+        <p>嘘声直指当前帮写论文的业务存在合规风险，要求宁梓淇与邓淇明确合规底线，一针见血点破代写论文的合规红线，直指业务合规性是项目生死线。随后邓淇也坦言该业务确实游走在灰色地带。</p>
+        <p>鉴于此，嘘声强调项目必须取得合规资质才能铺开，并警告若缺乏合规背书，极易因被举报而面临封号下架的风险，用“没毕业就被抬走”的极端后果，将合规风险具象化，倒逼团队正视隐患。</p>
+        <p>面对合规压力，邓淇表示这正是接下来要重点汇报的应对策略，嘘声随即同意听取后续方案，及时抛出合规方案，成功将讨论焦点从风险质疑拉回业务推进上。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">12:07</span>
+        <p>邓淇阐述了按需求生成文本的新交互逻辑，目标客群定位为学生及有汇报、比赛等文本需求的人群。</p>
+        <p>针对此定位，嘘声犀利质疑大学生懂用AI会直接覆盖该需求，一针见血地点破了产品可能被通用AI平替的核心风险。</p>
+        <p>邓淇则反驳称当前大学生水平有限，且即便会用AI，现有工具也能帮其省去反复修改的麻烦，试图用“省时省力”的性价比来构筑护城河。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">13:55</span>
+        <p>针对目标客群，邓淇重申产品面向全体有汇报需求的大学生。嘘声则认为高学历学生具备较强AI应用能力，建议避开他们，主攻中低端学生群体，两人对高学历学生的AI应用能力认知截然相反，导致目标客群画像产生分歧。</p>
+        <p>随后，嘘声将学生群体比作金字塔，明确主张优先向中低端群体推销，邓淇对此表示理解并结束了该话题的讨论，邓淇未继续反驳，顺势将话题翻篇，暂且搁置了客群定位的分歧。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">15:34</span>
+        <p>嘘声建议为需求名称增设“通俗化”列，以适配大学生受众的认知水平，并强调产品命名必须直观易懂才能降低使用门槛，从客群定位直接落地到UI命名，可见其运营思维相当务实。</p>
+        <p>面对该建议，邓淇与宁梓淇澄清当前表格实为后端内部协议，而客户端展示界面由他们另行构思，及时厘清了内部工具与客户端的边界，避免了跨角色的无效对齐。</p>
+        <p>嘘声随即调整方向，指出当前复杂流程虽不面向客户，但团队内部必须先梳理出清晰的SOP，确保自身能讲明白，从“对客易用”转向“内部讲清”，顺势把讨论焦点拉回内部共识。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">17:20</span>
+        <p>嘘声建议在需求类型左侧增设“作用”列，以明确功能收益。他指出产品需具备用户视角，若仅内部能看懂，其商业价值将受限，一针见血点破了内部视角与商业化之间的壁垒。</p>
+        <p>随后，他引用过往经历强调“用户视角”是营销运营的必备要素。邓淇对此表示认同并确认该列将补齐用户视角，双方顺利对齐了产品设计的底层逻辑。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">19:12</span>
+        <p>针对概念对齐，嘘声将“skill”通俗化定义为“功能”，强调其本质是一套能直接产出可用产品的完整SOP，把抽象的技术概念翻译成客户听得懂的大白话，这才是破局的关键。</p>
+        <p>基于此，邓淇拍板采纳建议，决定增设一张从用户视角剖析的表格，从内部研发思维转向用户价值思维，直接拉高了需求文档的商业落地价值。</p>
+        <p>随后，嘘声以产品经理视角，拆解了现有平台从运营上传到QA审核交付的A to B to C全链路，用实际业务流把“拿来干嘛”讲得明明白白，彻底打通了从概念到落地的最后一公里。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">20:58</span>
+        <p>嘘声以产品经理视角梳理了从需求收集到技术评估的完整链路。他提出为长下拉列表增加“打字查询”功能，以解决长列表查找耗时的问题，从长列表痛点切入，精准切中了用户体验的优化方向。</p>
+        <p>随后，嘘声将“打字查询”的提效逻辑与产品核心理念相挂钩，强调其本质都是“花少量成本换取时间”。至此，他完成了对功能从提出到研发评估的全流程剖析，巧妙地将一个具体的交互优化，升华成了产品核心价值的体现。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">22:45</span>
+        <p>嘘声总结功能闭环逻辑，邓淇高度认同其“用户视角”，产品思维与研发逻辑在此达成初步共识。随后嘘声指出该视角应是研发的基本素养，邓淇顺势确认需求客观存在。</p>
+        <p>针对目标用户，邓淇明确为不愿花时间折腾的“学生群体”，精准切中了“懒人经济”的痛点。他强调产品旨在用固定框架替代重复性劳动，帮助用户省去耗时且缺乏参考的繁琐过程。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">24:27</span>
+        <p>针对参考范本获取问题，嘘声指出网络发达使资料极易获取，但用户未必能将其转化为实际产出，一语点破信息差不等于执行力，资料好找不代表能落地。邓淇对此表示认同。</p>
+        <p>随后，邓淇提出合规化业务方案，将原有“卖具体业务”转变为“卖服务”，用“提供通用框架+代编排”替代“直接产出”，巧妙规避了代写的合规风险。他明确只负责按通用架构编排用户提供的资料，不关心其具体用途。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">26:07</span>
+        <p>针对邓淇提出的将业务从“直接交付文本”转向“信息提取与排版填充”以规避风险的方案，嘘声要求对方用简短语言重新阐述，通过“挤牙膏”式追问，倒逼对方剥离复杂包装，直击方案核心。</p>
+        <p>随后，嘘声将邓淇的长篇大论精准提炼为“帮你改东西”，即基于客户提供的未知内容，用模板将其加工成所需形式，一语点破商业包装的本质，用大白话将复杂的业务逻辑降维拆解。邓淇对此表示认同。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">27:59</span>
+        <p>针对软件上线风险，嘘声强调必须先获取官方许可与备案，以防触碰合规红线，他以政商双重背景施压，意在强行拉高项目的合规门槛。</p>
+        <p>面对合规压力，邓淇主张先跑通功能看市场反馈，再同步推进备案，认为私营网站前期合规压力可控，他试图用“先上车后补票”的逻辑，将合规后置以换取开发速度。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">29:43</span>
+        <p>针对合规争议，嘘声坦言暂不了解市场，邓淇顺势敲定“走一步看一步”策略，主张先上线看反馈再定夺，用市场试水来对冲合规风险，主打一个边走边看。</p>
+        <p>嘘声追问可视化版本交付时间，邓淇承诺周末前上线首版，并敲定数据库前期直接部署单机，采用极简架构，单机部署主打一个“快”，先跑通闭环再说。</p>
+        <p>邓淇强调当前首要目标是快速验证产品效果与免费推广数据，宁可牺牲部分成熟度也要抢时间，明摆着是先用粗糙的MVP去探底，效率优先于完美。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">31:31</span>
+        <p>邓淇强调产品需尽早发布以抢占市场，并顺势将推广引流的难题抛给嘘声，这波“业务难题”的请教，实则是想让对方分担后续的获客压力。</p>
+        <p>嘘声坦言自身职责偏向内部管理而非业务拓展，在缺乏明确客户画像的情况下，提议通过小红书等自媒体平台进行产品试用推广，巧妙地将业务拓展包装成了合规的“产品自测”。</p>
+        <p>此外，嘘声补充了第二个引流方向，即通过开源社区GitHub积累Star数，借助技术社区的自发传播来实现推广。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">33:14</span>
+        <p>针对GitHub引流，嘘声提议删减私有代码后开源前端。邓淇以暴露操作逻辑易被逆向为由坚决驳回，前端一开源就等于把操作逻辑全亮底牌了，这风险确实大。</p>
+        <p>被拒后，嘘声转变思路，建议反向利用GitHub，寻找并借鉴现有同类项目的分支，开源引流行不通，索性把思路掰成了“借力打力”。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">34:53</span>
+        <p>邓淇与嘘声就竞品调研与功能借鉴达成共识。邓淇计划近期盘点市场竞品功能以查漏补缺，并提及已与梓淇完成论文调研的分工，从借鉴竞品转向深挖论文，旨在寻找更底层的技术支撑。</p>
+        <p>随后，邓淇主动承担研发重任，并向嘘声请教私域搭建、产品推广及引流等营销实操策略，研发端主动挑大梁，顺势将营销破局的难题抛给了对方。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">36:35</span>
+        <p>针对私域搭建，嘘声坦言自身缺乏实操经验需现学，并建议先从熟人圈层导流起步。邓淇顺势敲定先在校内试点，面对未知的营销领域，两人默契地选择了最稳妥的熟人社交模式。</p>
+        <p>随后邓淇提出“100人转化10人”的试水目标，被嘘声直接判定预期过高，这波“冷水”泼得相当干脆，直接拉低了试错成本。邓淇则试图用毕业设计的实物需求来论证商机。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">38:11</span>
+        <p>邓淇强调宣传对产品成败的极端重要性，认为酒香也怕巷子深，竞品可能靠营销抢占市场，他敏锐抓住了初创项目“产品与营销缺一不可”的痛点，思路很务实。</p>
+        <p>嘘声指出GitHub上已有大量类似项目，建议拉取参考。邓淇随即反驳，认为拉取的代码未必是完整样品，面对竞品压力，他选择用“代码不完整”来打消顾虑，暂未正面回应竞争风险。</p>
+        <p>随后宁梓淇与嘘声查看仓库，嘘声强调GitHub上的技术文档客户根本看不懂，明确产品必须面向客户而非技术，他一针见血地点破了“技术自嗨”的误区，把产品定位拉回了用户视角。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">39:57</span>
+        <p>邓淇与嘘声确认可参考开源项目来完善系统。宁梓淇则指出若未来产品商业化，将开源代码闭源存在侵权风险，一语点破技术选型背后的法律合规红线。对此，邓淇与嘘声认为仅参考部分功能不影响自主开发，风险可控。</p>
+        <p>会议临近尾声，宁梓淇因会议室预约仅剩最后一分钟，提议重新开房续会。邓淇随即准备新建会议室，嘘声则对会议时长之短表示惊讶，技术讨论正酣却遭硬性打断，只能无奈另寻“阵地”。</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 会议 3 ============ -->
+<section class="meeting" id="m3">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>AI 论文生成工具需求与差异化研讨</h2>
+  </div>
+  <div class="sec-meta">
+    <span>发言人：<b>宁梓淇、邓淇、嘘声</b>（据实录整理）</span>
+    <span>实录时长：约 32 分钟</span>
+  </div>
+
+  <h3 class="block-title">会议摘要</h3>
+  <div class="callout">本次会议围绕一款面向大学生的AI一键生成论文工具展开讨论，明确了该工具的核心功能定位为“懒人式”源码转论文，并重点探讨了客户真实需求与产品差异化方向。</div>
+
+  <h3 class="block-title">议题与结论</h3>
+  <div class="grid">
+    <div class="card">
+      <h4><span class="tag">一</span>工具功能定位与用户画像</h4>
+      <ul>
+        <li><b>目标用户群体：</b>主要面向大学生群体，特别是面临博士论文或大型项目结题压力的学生。</li>
+        <li><b>核心使用场景：</b>用户希望一次性将项目源码转化为符合要求的论文，避免反复与AI对话修改的低效过程。</li>
+        <li><b>核心功能特征：</b>主打“懒人式”一站式生成服务，用户上传源码后即可快速获得成品论文。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">二</span>核心议题探讨</h4>
+      <ul>
+        <li><b>需求动机分析：</b>会议重点讨论了客户为何需要此类工具，强调需深入挖掘用户的真实痛点。</li>
+        <li><b>差异化竞争策略：</b>明确产品的核心竞争力在于提供差异化的解决方案，需进一步界定产品区别于其他同类工具的独特价值。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="block-title">过程实录</h3>
+  <details class="transcript">
+    <summary>展开查看会议过程实录（约 20 条）</summary>
+    <div class="tl">
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">hi，我是你的元宝会议助手，我正在帮你实时记录会议纪要，请安心开会！</p></div>
+      <div class="tl-item"><span class="tl-time">01:47</span>
+        <p>嘘声对当前的项目想法表示认可。随后，宁梓淇在确认设备收音正常后，向嘘声详细阐释了该项目的具体功能。</p>
+        <p>宁梓淇将产品定位为“懒人式”论文生成工具，用户只需上传源码即可直接产出符合要求的论文，直击用户想省事的核心诉求。紧接着，他抛出“客户为何需要该产品”的核心疑问，直指当前产品逻辑闭环中最大的待解缺口。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">03:28</span>
+        <p>针对宁梓淇对产品核心价值的追问，邓淇以普本院校学生做毕设为切入点，指出该群体普遍缺乏论文写作经验，且极易在繁琐的格式排版与文献综述上耗费大量精力，精准抓住了“没经验”与“嫌麻烦”两大痛点。</p>
+        <p>邓淇进一步强调，对于不熟悉Word、PS等基础办公软件的学生而言，独立完成排版与表格填充不仅耗时极长，更是重新学习软件的过程，体验极其痛苦，将工具的核心价值从“生成内容”精准降维到了“解决排版焦虑”。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">05:10</span>
+        <p>邓淇阐述了AI论文工具的运作逻辑，旨在大幅降低时间成本，由AI Agent接管论文生成与修改，学生仅需下达指令与最终审阅，说白了就是把写论文的苦差事全甩给AI，学生只管“动嘴”。</p>
+        <p>随后，宁梓淇提炼了该工具的核心痛点，将其归结为“懒得写、懒得学、懒得反复打磨”，邓淇对此表示认可，两人一拍即合，直接把产品定位成专治“懒癌”的提效神器。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">06:47</span>
+        <p>嘘声以金字塔视角拆解用户需求，指出底层用户痛点全覆盖，并推演了第二层（懂架构但懒得写）与第三层（懂架构且愿意写但懒得改）群体的使用场景，通过分层拆解，将模糊的用户画像精准具象化。</p>
+        <p>针对“懒得改”的群体，嘘声将其核心诉求精准锚定在“根据导师反馈反复修改”的环节，邓淇对此表示认同，这直接点透了产品核心价值，即充当师生间高效的“传话筒”。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">08:26</span>
+        <p>邓淇提议针对高要求用户提供论文转PPT等增值服务，并抛出“人唯一不变的就是懒”的需求逻辑，试图用“懒人经济”理论拓宽产品边界。</p>
+        <p>宁梓淇随即驳回该设想，认为对论文有高要求且愿意打磨的用户，更倾向于自己调教AI，不会选择外部服务，精准点破了产品定位与高要求用户习惯间的错位。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">10:09</span>
+        <p>邓淇总结前序讨论，将目标客群锁定在“追求省事”的大学生群体，认为其已覆盖九成主流市场，用“懒”作为核心痛点，直接划定了产品初期的精准受众。</p>
+        <p>随后，嘘声与宁梓淇因视频显示异常短暂闲聊，话题一度偏离至宠物猫。最终嘘声主动控场，将焦点拉回“客户金字塔”评估模型，及时切断发散话题，确保了会议主线的推进。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">11:54</span>
+        <p>嘘声梳理完商业流程后，邓淇提议按当前框架先推进，并明确接受“先上线”的策略，框架未定先跑起来，主打一个敏捷试错。随后，邓淇承诺将与宁梓淇抓紧推进软件上线。</p>
+        <p>嘘声拍板当前两大核心任务：完成产品上线与获取官方认证，并指出一旦跑通，后续获客将水到渠成，把复杂的商业闭环砍成两件事，主打一个抓大放小。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">13:33</span>
+        <p>嘘声以过往拓客经验为例，强调初期需依靠核心骨干拉客源，待业务跑通后再逐步下放管理权并招新，这番话点透了早期团队“先跑通闭环再扩张”的务实逻辑。</p>
+        <p>随后，嘘声明确了“先有产品再谈推广”的优先级，敲定先完成产品上线与试点，官方认证等事宜则延后研究，果断将资源聚焦于产品落地，避免了在长线规划上过早消耗精力。邓淇对此表示认可。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">15:10</span>
+        <p>针对项目推进，邓淇明确了分工机制，日常技术与运营由其与梓淇推进，重大事项再拉嘘声开三人会议同步，把日常琐事挡在门外，主打一个不占用核心成员精力。</p>
+        <p>面对嘘声的“大公司”身份，邓淇坦言当前发不起工资，仅以马尔代夫做远期愿景，嘘声则顺势将自身贡献锚定在数据分析上，一顿KFC的玩笑话，把现实骨感与务实预期拉齐了。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">16:49</span>
+        <p>宁梓淇感叹大厂自建模型，嘘声顺势透露其新项目数据采集量已暴增至7000台设备、日采集量翻500倍，宁梓淇直言非自动化流程根本扛不住，这数据量听着唬人，但话里话外都在暗示，纯靠堆人根本没法干。</p>
+        <p>嘘声坦言因原主管离职，虽面临高薪经理职位的挖角，但极度抗拒承担管理责任与冗长会议，只想安稳干活，钱给得再多也不想当经理，宁可守着安稳小日子也不愿去趟管理的浑水。</p>
+        <p>面对宁梓淇的怂恿，嘘声坚决拒绝并吐槽管理层会议繁多，邓淇见状打趣道这深夜会议确实打扰了对方，这波打趣纯属客套，说白了就是各过各的，谁也不羡慕谁的活儿。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">18:34</span>
+        <p>针对嘘声半夜加班的辛劳，邓淇与宁梓淇建议其请假施压涨薪。但嘘声坦言公司新招了众多名校生，自己已退居幕后转做新项目主力，面对高学历新人的冲击，他主动让出核心位置，主打一个“避其锋芒、明哲保身”。</p>
+        <p>随后，嘘声向宁梓淇确认设备已全面更换为安卓。他透露当前各大厂均已下场做数据采集，渠道规模已呈爆发式增长，大厂重金下场，直接把数据采集卷成了红海，小团队面临的生存压力肉眼可见。</p>
+        <p>基于大厂入局且渠道规模庞大的现状，邓淇担忧其所在团队后续会被大公司“干死”，这波担忧一针见血，大厂自带渠道与资金碾压，小团队的生存空间确实岌岌可危。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">20:13</span>
+        <p>针对邓淇对资本碾压小公司的担忧，嘘声坦言打工人无力改变现状，并分享了自己“退居二线”的生存策略，主打一个“老板吃肉我喝汤，绝不替老板扛雷”的清醒职场哲学。</p>
+        <p>随后话题转向休假中的同事杰森，嘘声与邓淇对其“干着玩”的财务自由状态羡慕不已，直言杰森随时能撤退，这波职场人设的对比，把打工人的无奈与底薪差距展现得淋漓尽致。</p>
+        <p>最后，宁梓淇总结了当前行业困境，指出需求方已能自给自足，业务方又被大厂资本挤压，一句话点透夹缝中生存的小公司两头受气的艰难处境。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">21:52</span>
+        <p>嘘声以英伟达为例，证实其客户群体质量极高且管控极严，能拿下英伟达，足见其在头部客户圈子里确实有一席之地。宁梓淇对此表示认可。</p>
+        <p>针对产品优化，嘘声表示当前策略已转向优先追求泛化与数据量，放弃细节优化，大厂客户要的是通用性，细节优化再好也换不来大收益，只能被砍掉。</p>
+        <p>由于与顺丰合作中的优化建议被驳回，嘘声坦言双方已沦为“不完全参与”状态，自己纯属摸鱼，优化提了没用，索性就当个边缘人，主打一个随缘。邓淇则打趣让他抓紧时间玩。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">23:30</span>
+        <p>嘘声担忧自己“摸鱼”状态会导致被裁。邓淇极力宽慰，认为其技术能力过硬，除非公司倒闭否则绝不会被开除，这波彩虹屁直接给足了情绪价值，主打一个“兄弟放心摸”。</p>
+        <p>随后众人闲聊起人事变动，嘘声澄清陈哥并未跑路，而是调去了机械臂部门。接着大家八卦起离职同事董辉的去向，嘘声推测其可能去美国了，从摸鱼焦虑无缝切入八卦模式，职场闲聊的经典画风。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">25:14</span>
+        <p>嘘声调侃想去美国却不会英语，邓淇则打趣称有钱就行。随后宁梓淇问起浩南哥近况，嘘声称其还在国内且全能，借着调侃老同事，大家顺势把话题从海外羡慕转移到了国内近况上。</p>
+        <p>聊及前司待遇，嘘声表示现在技术岗起薪七千以上，邓淇听闻后大呼心动，却因技术不够用且拉不下脸吃回头草而拒绝，嘴上喊着“骗我来世不送”，身体却很诚实地盘算起重返老东家。</p>
+        <p>针对邓淇的顾虑，嘘声宽慰其技术傍身，并建议用AI辅助。随后宁梓淇顺势抛出“纯硬还是欠软馄饨”的新话题，眼看劝人回老东家没成，大家干脆换个方向继续闲聊。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">27:04</span>
+        <p>嘘声确认自己正从事数据分析工作，并计划前往陈哥处。宁梓淇顺势爆料称奥特内部曾有不少针对陈哥的负面八卦，这波闲聊直接把吃瓜氛围拉满。</p>
+        <p>随后，嘘声详细盘点了公司办公区从“迅美”到“BB栋”再到包下“6楼”的变迁史，并透露4月起已彻底取消休眠机制，这波回忆杀顺手就把公司发展史盘明白了。</p>
+        <p>顺着办公变迁的话题，嘘声笑称自己电脑里还存着公司首个采集任务的“古董文档”，堪称公司的技术活历史，邓淇则打趣说这简直是新手知识库，用自嘲式调侃完美收尾了这场闲聊。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">28:43</span>
+        <p>宁梓淇与邓淇鼓励嘘声跳槽去当经理，嘘声顺势透露出差的渠道老乡曾开出独立工作室的天使投资条件，这波“凡尔赛”式炫耀，把职场诱惑力直接拉满了。</p>
+        <p>面对这般优厚条件，嘘声却连连推脱，坦言自己只想安稳赚小钱，不敢去冒险，主打一个“钱多事少求安稳”，跟另两人的野心形成鲜明对比。邓淇随之调侃“穷是原罪”，道破了现实的无奈。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">30:23</span>
+        <p>顺着创业话题，宁梓淇评估项目前期成本极低，嘘声顺势抛出大厂每月380元无限用云服务的福利进行“反向劝退”，这波“秀肌肉”直戳痛点，把大厂福利的诱惑力拉满了。</p>
+        <p>随后邓淇提议散会，嘘声要求团队梳理需其协助的事项，宁梓淇确认将基于历史纪要输出汇总文档，会议从闲聊无缝切换至收尾，明确分工后迅速收场。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">32:04</span>
+        <p>宁梓淇指出多视角沟通属于“用户故事地图”方法论，嘘声随之安排会后总结与答疑，并提议将纪要交由科sir自行核对，把后续沟通成本顺势转移给了第三方。</p>
+        <p>因邓淇设备没电，嘘声催促宁梓淇口头收尾。宁梓淇随即简述了从多视角出发、简单化协作的推进形式，并回顾了产品定位，收尾节奏紧凑，主打一个能省则省。</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 会议 4 ============ -->
+<section class="meeting" id="m4">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>AI产品架构与竞品研讨</h2>
+  </div>
+  <div class="sec-meta">
+    <span>发言人：<b>青禾、宁梓淇、工网221江伊潭</b></span>
+    <span>实录时长：约 17 分钟</span>
+  </div>
+
+  <h3 class="block-title">会议摘要</h3>
+  <div class="callout">本次会议明确了AI模型调用策略与用户权限隔离方案，规划了前端展示的免责声明，并讨论了竞品功能借鉴与后续开发分工。</div>
+
+  <h3 class="block-title">议题与结论</h3>
+  <div class="grid">
+    <div class="card">
+      <h4><span class="tag">一</span>AI模型调用与用户权限方案</h4>
+      <ul>
+        <li><b>模型调用策略：</b>模型选择由内部决定：为避免后期因指定特定模型（如DeepSeek或Kimi）导致“货不对版”的风险，系统不向用户展示具体调用的AI模型，用户仅需关注最终效果。基于性价比灵活切换：开发团队将根据实际效果和成本，在管理后台灵活配置和切换性价比最高的AI模型。</li>
+        <li><b>用户权限与安全隔离：</b>暂不开放用户自定义API：考虑到开放接口会增加内核暴露风险及安全资产（API Key）保存风险，决定暂不提供用户接入自有API的功能。管理后台独立开发：针对管理员与普通用户的权限差异，后续将在管理后台进行独立开发，以满足内部测试与管理需求。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">二</span>前端展示与免责声明规划</h4>
+      <ul>
+        <li><b>免责声明与隐私承诺：</b>首页展示免责声明：前端首页需明确展示作者说明、联系方式及免责声明，强调系统仅提供辅助性功能且不会保存用户数据。前置风险规避：必须在产品最开始阶段完善免责声明，以规避后续可能出现的合规与责任风险。</li>
+        <li><b>前端生成工具分享：</b>统一前端生成工具：当前前端页面由一款专门的生成式AI Agent生成，后续计划将该工具分享给团队，以保持前端开发风格的一致性。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">三</span>竞品研究与功能借鉴</h4>
+      <ul>
+        <li><b>竞品功能现状：</b>支持DOCX解析与公式生成：开源竞品具备解析DOCX格式文档的能力，并能调用特定Skill生成LaTeX学术公式。</li>
+        <li><b>功能借鉴策略：</b>剥离并复用核心Skill：计划将竞品中的公式生成等核心Skill部分剥离出来，进行完善后集成至当前产品中，实现专人专事与定向维护。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">四</span>后续开发分工与协作机制</h4>
+      <ul>
+        <li><b>需求梳理与开发分工：</b>制定开放需求表：青禾将负责梳理当前系统与预期目标的差距，并输出具体的开放需求表。核心开发由两人负责：具体的开发工作主要由青禾和宁梓淇承担，工网221江伊潭因时间限制不直接参与开发。</li>
+        <li><b>对抗性审查机制：</b>引入用户视角审查：工网221江伊潭将作为用户代表，对需求文本或Word文档进行对抗性审查，从用户视角提出质疑以完善方案。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="block-title">待办事项</h3>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>#</th><th>事项</th><th>负责人</th></tr></thead>
+      <tbody>
+        <tr><td class="idx">1</td><td>在管理后台开发AI服务配置平台，实现模型灵活切换。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">2</td><td>完善前端首页的免责声明与隐私承诺内容。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">3</td><td>线下测试开源竞品的公式生成Skill功能。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">4</td><td>梳理系统差距并输出开放需求表。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td class="idx">5</td><td>作为用户代表，对需求文档进行对抗性审查。</td><td><span class="owner o-slate">工网221江伊潭</span></td></tr>
+        <tr><td class="idx">6</td><td>将会议纪要同步至项目组织群及知识库中。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">过程实录</h3>
+  <details class="transcript">
+    <summary>展开查看会议过程实录（约 12 条）</summary>
+    <div class="tl">
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">hi，我是你的元宝会议助手，我正在帮你实时记录会议纪要，请安心开会！</p></div>
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">开启会后保存纪要到元宝App，会后随时追问~</p></div>
+      <div class="tl-item"><span class="tl-time">01:41</span>
+        <p>宁梓淇确认设备正常后，与青禾对齐了AI选型策略。青禾明确决定对用户隐藏底层AI模型，旨在保留后续根据性价比灵活切换的自主权，这招“黑盒”策略，本质上是为后续降本增效留足了后手。</p>
+        <p>随后工网221江伊潭加入并发现青禾在用Claude Code，青禾澄清因国外模型受限，目前改用某国产模型，并强调其6元/百万token的成本优势。工网221江伊潭则建议直接换用DeepSeek，直接把价格拉到了同一起跑线。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">03:29</span>
+        <p>工网221江伊潭短暂跑题后，宁梓淇将话题拉回API策略。青禾指出，若向用户暴露具体的AI模型，后期会面临“货不对版”的商业风险，这波担忧直指底层逻辑，一旦绑定特定模型，后期降本或换源都会受限于客户预期。</p>
+        <p>基于此，青禾与宁梓淇拍板决定，不向用户展示底层模型，由己方全权掌控API的调度与替换权，用户只需关注最终效果，把模型选择权死死攥在自己手里，既保住了降本空间，也彻底规避了客诉风险。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">05:14</span>
+        <p>青禾与宁梓淇敲定在管理后台自建平台，由己方统一调度模型，用户仅关注效果。随后，宁梓淇提出允许用户接入自有API的新需求，试图将模型选择权下放给用户，以此增加产品的灵活性。</p>
+        <p>青禾果断驳回该提议，指出开放接口不仅会将系统内核暴露给外部，且外部大模型的不稳定行为易引发破坏，一语点破外部调用对系统安全构成的致命威胁。此外，他强调保存用户的API Key属于违规，存在极高的资产安全风险。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">07:03</span>
+        <p>针对用户接入自有API的诉求，青禾与工网221江伊潭拍板暂不支持，明确AI选型由内部基于性价比决定，并安排宁梓淇完善管理后台开发，果断砍掉边缘需求，集中资源保核心进度。</p>
+        <p>随后青禾演示了网站首页，指出需完善免责声明与联系方式等模块。两人就前置法律合规达成共识，强调必须“叠满甲”以规避后续风险，“叠甲”共识直击痛点，提前把免责声明做厚，给后续开发省去不少麻烦。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">08:56</span>
+        <p>青禾确认宁梓淇理解免责声明需求后，将系统功能细分为“管理平台”与“工作台”两大模块，并明确管理员需具备双端权限以便测试复现，功能边界划分清晰，提前为后续测试与排查铺路。</p>
+        <p>随后，青禾要求宁梓淇分享竞品调研进展。宁梓淇指出开源项目在格式处理上与其高度相似，且已有专门生成LaTeX公式的技能，直接点明了项目在底层逻辑上并非首创，存在可借鉴的成熟方案。</p>
+        <p>基于此，工网221江伊潭要求宁梓淇尽快拉取该技能进行线下测试。宁梓淇虽认同测试价值，但表示需延后处理，面对具体的落地执行要求，宁梓淇选择了暂缓推进。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">10:33</span>
+        <p>针对竞品研究，青禾与工网221江伊潭要求宁梓淇给出实际运行结论。宁梓淇坦言未实际跑过，仅基于README梳理出两大核心功能：解析DOCX格式与生成LaTeX公式，并建议后续直接复用，调研仅停留在文档层面，尚未形成实质性验证。</p>
+        <p>随后，青禾就竞品是否将“内容整理”与“格式编排”囊括在同一模块内进行追问，宁梓淇明确确认两者确实合并，并解释此举是为配合公式生成，两人通过追问，快速对齐了竞品的功能边界。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">12:21</span>
+        <p>青禾与宁梓淇对齐了将外部skill剥离并独立维护的策略，旨在实现专人专事与定向维护，剥离外部依赖，本质是为了降低后期维护成本与耦合风险。</p>
+        <p>随后，青禾明确了团队分工，由自己与梓淇负责梳理需求并主导开发，而工网221江伊潭因时间有限，被安排担任“用户视角”进行对抗性审查，让非开发成员扮演“找茬”用户，巧妙弥补了内部视角的盲区。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">14:08</span>
+        <p>青禾将项目资料同步给工网221江伊潭，期望其在空闲时承担“对抗性审查”角色。工网221江伊潭应允但提出只能用手机查看，因公司电脑装了监控，用电脑会被抓，监控太严，只能拿手机看资料，主打一个见缝插针。</p>
+        <p>众人随即将话题转向职场现状，工网221江伊潭大吐苦水称电脑监控极严，连写个人项目都受限，吐槽监控严到没法搞副业，只能写写自用工具。青禾则回忆起当年实习连AI都禁用的惨状。</p>
+        <p>随后，工网221江伊潭提及公司每周在算力上豪掷数百万人民币。面对这惊人的烧钱速度，青禾与宁梓淇直呼“真有钱”，大厂算力开销太夸张，听得人直呼财大气粗。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">15:49</span>
+        <p>宁梓淇准备下线，工网221江伊潭对宁梓淇感叹大厂规模的言论进行冷处理，直言“不是啥好事儿”，大厂光环在严苛监控下瞬间祛魅，主打一个“钱多事多管得严”。</p>
+        <p>随后青禾分享了用生成式AI制作前端页面的经验，并顺势提出后续项目需统一UI风格的规划，用AI提效的同时不忘把控整体视觉规范，兼顾了速度与质量。</p>
+        <p>期间青禾提及自己在闲鱼低价代充了20美元，引得宁梓淇与工网221江伊潭一阵爆笑调侃，这波“薅羊毛”的野路子操作直接把群里的欢乐值拉满。最后青禾敲定后续将先产出需求再推进开发。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">16:42</span>
+        <p>工网221江伊潭提议建立专门的知识库数据库以存储每日会议纪要，宁梓淇顺势拍板同意，并敲定将纪要直接发至群内归档，顺势把口头约定变成了标准化的团队资产。</p>
+        <p>随后，工网221江伊潭要求青禾“开源”前端项目代码，以便后续结合需求进行查看与讨论，这波“开源”请求，实则是为后续评估代码可用性铺路。最终众人确认无新增议题，愉快散会。</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 会议 5 ============ -->
+<section class="meeting" id="m5">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>AI文书辅助平台方案研讨</h2>
+  </div>
+  <div class="sec-meta">
+    <span>发言人：<b>青禾、工网221江伊潭、宁梓淇、嘘声</b></span>
+    <span>实录时长：约 39 分钟</span>
+  </div>
+
+  <h3 class="block-title">会议摘要</h3>
+  <div class="callout">本次会议围绕AI文书辅助平台的架构设计、合规要求及市场定位展开研讨，明确了插件化场景方案与三类测试场景，并安排了开发任务与合规准备事项。</div>
+
+  <h3 class="block-title">议题与结论</h3>
+  <div class="grid">
+    <div class="card">
+      <h4><span class="tag">一</span>平台架构与核心功能设计</h4>
+      <ul>
+        <li><b>插件化场景架构：</b>预设场景插件化：平台将预设场景（如毕业设计、技术汇报等）以插件形式提供，用户可根据需求载入特定插件，并支持用户自定义场景。用户模板优先机制：平台提供通用框架，若用户上传了自定义模板，系统将优先套用用户的模板进行生成。六层能力框架：平台整体架构包含统一工作空间、资料理解、文书能力层、场景编排、执行引擎以及检验审阅六个层级。</li>
+        <li><b>核心交互与修改功能：</b>事实确认前置：在AI分析项目资料后，增加事实确认环节（如弹窗或界面提示），允许用户核对或补充遗漏信息后再进行后续生成。兼容已有文本导入：系统需支持用户导入已写好的部分文本，借助AI工具直接进行审阅与修改，而非仅支持从零开始生成。页面实时可视化：前端页面需增加右侧预览区，实现文本修改进度的实时可视化，并探讨支持图形识别与圈点勾画功能。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">二</span>竞品分析与市场定位</h4>
+      <ul>
+        <li><b>竞品现状与优势：</b>竞品缺乏完整业务体系：当前市面上的竞品主要仅具备底层引擎技术，缺乏完整的业务性产品体系，本平台在业务闭环上具备优势。</li>
+        <li><b>目标用户群体与测试场景：</b>三类测试场景规划：针对大专生、二本/一本学生、985/211学生分别开发不同的模板，以满足不同群体的论文规范与辅助需求。明确辅助工具定位：平台必须明确自身为“辅助工具”而非“代写工具”，最终成品责任由用户自行承担，以规避合规风险。口语化需求展示：在市场推广与运营中，需将专业的需求金字塔转化为口语化的表达，降低用户理解门槛。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag">三</span>合规性与数据安全措施</h4>
+      <ul>
+        <li><b>资质与备案要求：</b>ICP网站备案：平台若需生成生成性文本，必须完成ICP网站备案。AI生成标识：根据国家规定，AI生成的内容必须做好相应的告知和标识。软件著作权申请：为保护核心技术与防止盗版，后续需同步推进软件著作权的申请流程。</li>
+        <li><b>数据安全与隐私保护：</b>敏感信息模糊化处理：在用户上传资料时，系统需做好信息隔离，对姓名、籍贯等敏感个人信息进行模糊化或去除处理。匿名登录机制：考虑允许匿名登录使用，以进一步保护用户隐私并防止后续追责。数据库加密：用户数据库必须保证不外泄，并需做好数据加密工作。</li>
+        <li><b>后端管理与API接入：</b>用户管理入口：后端需具备管理用户注册信息及生成文本数据的Admin总览入口。API平台接入：当前已实现兼容四种预设API平台的轮换调用，后续将考虑是否开放允许用户接入自有API。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="block-title">待办事项</h3>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>#</th><th>事项</th><th>负责人</th></tr></thead>
+      <tbody>
+        <tr><td class="idx">1</td><td>梳理当前项目与通用平台架构的差异，形成需求表与具体开发任务清单。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td class="idx">2</td><td>基于分支开发一版可直接生成成品的试用版Demo供客户体验。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">3</td><td>作为用户视角体验Demo并进行审查。</td><td><span class="owner o-red">一谈</span></td></tr>
+        <tr><td class="idx">4</td><td>开发针对大专生、二本/一本学生、985/211学生的三类测试场景模板。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">5</td><td>将需求金字塔转化为更口语化的表达形式并重新制作图表。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td class="idx">6</td><td>测试平台是否支持多屏多电脑登录。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td class="idx">7</td><td>梳理并确认后端Admin管理入口及API平台接入的具体实现方式。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="block-title">过程实录</h3>
+  <details class="transcript">
+    <summary>展开查看会议过程实录（约 25 条）</summary>
+    <div class="tl">
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">hi，我是你的元宝会议助手，我正在帮你实时记录会议纪要，请安心开会！</p></div>
+      <div class="tl-item"><span class="tl-time">00:00</span><p class="dim">开启会后保存纪要到元宝App，会后随时追问~</p></div>
+      <div class="tl-item"><span class="tl-time">01:36</span>
+        <p>青禾确认宁梓淇能听到声音后，正式切入正题。他针对昨日讨论不够详细之处进行了重新展开，旨在补齐昨日的遗漏，把讨论往前推一步。</p>
+        <p>随后，青禾重点汇报了对“合规性”的专项研究成果，表示已将资料同步给一谈，并总结成了HTML文件供其从Github查看，可见资料已经成型并落到代码库里了。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">03:14</span>
+        <p>青禾共享屏幕，针对“通用平台”与现有框架的融合方案进行了重新梳理与汇报，旨在填补昨夜讨论中缺失的落地路径。</p>
+        <p>为实现平台通用性，青禾提出借鉴大模型插件机制，将“毕业设计”、“技术汇报”等预设场景做成可搜索的插件供用户按需载入，用插件化思路巧妙化解了场景单一的痛点。</p>
+        <p>此外，青禾明确平台支持用户自定义场景，但强调系统会提供提示与分析进行辅助，在开放自由度与平台可控性之间划定了边界。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">04:50</span>
+        <p>青禾进一步明确了通用平台的落地路径，计划以预设框架为基础，结合用户自定义模板生成内容，并配套提供AI资料理解、文档生成与审阅等基础能力，从“插件式预设”到“基础能力沉淀”，平台架构的底层逻辑逐渐清晰。</p>
+        <p>随后，青禾详细拆解了平台的6层架构，涵盖统一工作空间、资料理解层以及负责逻辑排版与周期计划的文书能力层等核心模块，将复杂的AI能力拆解为具象的层级，为后续的技术开发划定了明确的边界。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">06:36</span>
+        <p>青禾补充了平台执行层与检验层的架构规划，明确执行层将引入Word编排引擎，而检验层则需独立开发作为专属后台，将检验层独立出来，显然是想把文档质量的把控权牢牢攥在自己手里。</p>
+        <p>随后，他梳理了平台的优先级逻辑，敲定“用户模板优先于通用框架”的接入策略，并以毕业设计为例，阐述了“结构化剥离加模板套用”的落地方案，说白了就是先剥离出通用骨架，再把用户的模板套上去，主打一个灵活适配。</p>
+        <p>在讲解完核心逻辑后，他尝试寻找一张图表以辅助说明，并顺势询问了其他参会者当前屏幕的可见情况，从理论推导切到看图演示，试图用可视化图表把刚才的架构逻辑彻底讲透。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">08:12</span>
+        <p>青禾明确了软件框架的落地路径，提议采用插件形式，通过预设场景选项实现定制化输出，用场景预设替代纯手工配置，大幅降低了通用框架的落地门槛。</p>
+        <p>随后，宁梓淇肯定了该方案，并基于竞品调研指出，当前竞品仅具备单一的文本解析与引擎能力，而己方方案已涵盖登录注册、平台等全链路闭环，竞品只做引擎，我们做全链路，这波对比直接把产品壁垒立住了。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">09:55</span>
+        <p>青禾与宁梓淇确认竞品缺乏完整业务体系，当前项目暂无竞品。基于此，青禾明确后续需以毕设场景切入，并沉淀需求与差异清单，明确了“竞品无完整业务”的护城河，为后续开发找准了发力点。</p>
+        <p>针对前期开发任务过于草率的问题，青禾决定今明两天重新梳理逻辑链并输出具体开发任务，宁梓淇对此表示赞同，主动复盘纠偏，及时将开发重心从盲目执行转向需求驱动。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">11:43</span>
+        <p>青禾与工网221江伊潭对齐了产品测试安排，敲定由一谈以纯用户视角进行体验审查，让真实用户先跑通流程，提前排雷体验上的坑。</p>
+        <p>针对商业化合规，青禾明确当前内测阶段暂不收费，因此无需注册经营主体，但强调网站ICP备案必须先行完成，合规底线划得很清，先拿备案保底，收费的事往后放。</p>
+        <p>此外，青禾补充了AI服务的审查红线，要求产品文案不能承诺“代写”或“代完成”，用“辅助”打擦边球，规避了虚假宣传的风险。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">13:29</span>
+        <p>工网221江伊潭明确产品定位为“辅助修改工具”而非“结果产出方”，旨在规避被追责的法律风险，用“辅助”二字巧妙划定责任边界，把合规底线守得死死的。青禾对此表示认同。</p>
+        <p>随后，青禾敲定了产品的阶段性推进策略，决定先打磨内部版本，再邀请体验客户免费试用，待版本成熟后再公开推广，典型的“小步快跑”策略，先用内测打磨产品，再图规模化推广。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">15:16</span>
+        <p>工网221江伊潭详细拆解了针对三类学历群体的模板开发策略：针对大专生提供基础生成服务；针对一本、二本学生提供辅助性服务，但需明确最终责任由学生自负，用“辅助”二字巧妙划定责任边界，规避了直接代写的合规风险。</p>
+        <p>针对985、211等高学历群体，他建议仅提供纯辅助的框架微调服务，以规避学术不端风险，随后他提议团队先向这三个方向拓展，这种“看人下菜碟”的策略，本质上是在合规红线与商业变现间寻找最大公约数。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">16:52</span>
+        <p>青禾提出需推进ICP网站备案，工网221江伊潭建议先保留部分流程，视测试阶段的实际需求再决定是否补齐，这种“按需备着”的策略，有效避免了前期过度投入。</p>
+        <p>针对AI生成文本，青禾强调需按规添加标识以保障合规。工网221江伊潭补充该标识兼具认证与防盗作用，旨在保护收费软件的著作权，将合规要求巧妙转化为防盗壁垒，一箭双雕。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">18:38</span>
+        <p>针对个人信息处理，工网221江伊潭强调数据库绝不能外露，并主张直接加密。但青禾拍板决定延后加密，优先保障开发进度，在“安全合规”与“开发效率”间，当前策略明显向业务推进倾斜。</p>
+        <p>随后，青禾系统梳理了合规清单，明确需界定售卖主体、申请资质许可、标注AI辅助服务，并全面保障隐私与网站安全，将散乱的合规要求梳理成明确的落地清单，为后续业务开展划定了红线。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">20:15</span>
+        <p>针对敏感信息处理，青禾提议对姓名等进行模糊化处理。但宁梓淇直言直接传信息存在违法风险，建议通过注册时的勾选声明来规避，直接点破了模糊化处理无法掩盖违规传数的法律风险。</p>
+        <p>工网221江伊潭认同该风险，提出增设“录入前请删除隐私”的提示。青禾认为用户不会主动删，主张在软件端做好隔离，工网221江伊潭强调即便用户不删，平台也必须保留该提示以防被追责，平台方必须保留免责提示，这是规避连带责任的底线操作。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">21:52</span>
+        <p>针对反爬机制，青禾提议延后处理，待产品见效后再推进。随后工网221江伊潭要求暂停页面，指出只需将“上传、生成、导出、结束”四个核心功能做成HTML即可，直接把需求拉回MVP，避免过早陷入边缘功能的开发泥潭。</p>
+        <p>针对数据存储，青禾坦言虽客观需保留原件，但明确只需存储AI分析后的结构化数据。工网221江伊潭则强调必须只保留用户模板而非个人信息，两人虽路径表述不同，但均直指“脱敏”与“免责”这一核心风控底线。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">23:43</span>
+        <p>针对用户登录机制，工网221江伊潭提议采用匿名登录以规避隐私泄露与追责风险，从产品形态转向了法律与合规层面的防御性考量。随后两人对齐了用邮箱注册的具体方案。</p>
+        <p>随后，工网221江伊潭盘点SaaS架构必备的日志与监控能力，并询问团队是否有相关落地方案，可见底层架构能力仍是当前推进的潜在瓶颈。青禾暂未正面回应，转而补充了信息来源的真实性。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">25:21</span>
+        <p>青禾梳理了系统“进入-理解-文书-交付”的四步流程，工网221江伊潭随即明确界定了演示界面的受众边界，指出上方细节供开发参考，下方内容则面向客户展示，及时拉齐认知，避免后续演示时开发与客户视角产生错位。</p>
+        <p>针对宁梓淇对7个体验约束实现难度的询问，青禾确认“上传即可分析”等基础体验后，补充了新增的“事实确认”环节，即分析前需增设弹窗或界面进行二次确认，新增的确认环节虽增加了交互步骤，但能有效规避AI幻觉带来的事实性风险。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">27:14</span>
+        <p>针对新增的“事实确认”环节，工网221江伊潭直言用户常会直接跳过说明，青禾对此认同，并明确该环节旨在提供灵活选项，交由用户自行决定，产品逻辑从“强干预”转向“弱提示”，契合了用户追求效率的底层诉求。</p>
+        <p>随后，宁梓淇指出产品需兼容“在已有文档基础上修改”的场景，而非仅支持从零生成。青禾高度认可该提议，并坦言此前确实忽略了非从零起点的用户，及时补齐了产品设计的盲区，有效避免了后续开发的逻辑漏洞。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">29:02</span>
+        <p>宁梓淇建议将“导入已有文本修改”作为新链路先记录，留待后续复盘时细化，先把点子存下来，避免当前讨论发散，等复盘时再深究细节。</p>
+        <p>随后工网221江伊潭指出当前前端右侧空白，提议增设“本页面直接预览成果”的功能，以实现实时查看修改进度，这波建议直击体验痛点，把“盲改”变成“可视化编辑”。</p>
+        <p>青禾顺势将功能具象化为“左侧圈点勾画、右侧AI实时修改”，并与工网221江伊潭对齐了交互逻辑，两人一拍即合，迅速把模糊的UI构想落地成了具体的操作闭环。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">30:48</span>
+        <p>针对图像识别功能，青禾与宁梓淇均认为存在难度。工网221江伊潭对此表示理解，并定调该功能“能做就做，不能做就不做”，技术门槛较高，团队对该非核心功能采取了务实的降级预期。</p>
+        <p>随后青禾纠正了工网221江伊潭的认知偏差，强调无需依赖前端可视化或图像识别，系统内部已知晓数据格式，只需通过打标或截屏精准定位文本即可，这波技术纠偏直击痛点，巧妙绕开了图像识别的技术死胡同。</p>
+        <p>宁梓淇听后迅速对齐思路，确认该功能本质上是为AI提供精准的反馈通道。青禾进而总结，前端展示与底层技术内核需解耦，底层逻辑应追求效率最大化，将“前端体验”与“底层逻辑”解耦，用底层数据直连替代前端图像识别，直接把技术难度打下来。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">32:29</span>
+        <p>针对技术实现，工网221江伊潭重申“能拿到钱就行”的商业导向，青禾随即补充核心前提：必须保证用户与技术端看到的效果统一，技术怎么实现不重要，最终呈现效果对得上才是底线。随后宁梓淇拍板推进后续议题。</p>
+        <p>随后青禾剖析了目标用户痛点，指出其缺乏写作与排版经验，且不愿在和老师沟通中反复修改。基于此，工网221江伊潭提议直接将需求金字塔展示给客户，以辅助推广与运营，把抽象需求具象化展示，能有效降低客户的理解门槛。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">34:18</span>
+        <p>工网221江伊潭与青禾对齐了产品推广策略，强调需用口语化表达降低用户理解门槛，并将核心需求精准总结为“减少无价值的重复整理”，说白了就是帮用户省去繁琐的文书整理，主打一个省事。</p>
+        <p>针对宁梓淇对内容重复的疑问，青禾与工网221江伊潭澄清该部分实为底层框架与初始Demo的详细阐述，旨在为后续开发提供信息源支撑，算是把底层逻辑和具体场景的关系理顺了，为开发扫清了认知障碍，宁梓淇对此表示认可。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">36:05</span>
+        <p>青禾与宁梓淇对齐了“场景插件化”的架构设计，将平台通用能力具象化为插件，通过切换插件为AI赋予不同能力，并支持按业务细分配置结构与排版，把通用能力拆成插件，本质是在为后续快速适配各类细分场景铺路。</p>
+        <p>随后，工网221江伊潭高度认可该设计，并顺势提议明天就挑最简单的“蓝桥杯”场景直接产出demo进行验证，从架构探讨迅速跳到实战测试，这波提议意在用最小成本快速验证方案可行性。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">37:46</span>
+        <p>青禾确认测试环境可直接使用Demo，宁梓淇也表示环境已配好且流程走通。随后，工网221江伊潭强调网页端绝不能出现无法多屏多端登录的低级错误，直接把基础体验的底线给卡死了。</p>
+        <p>鉴于此，青禾要求宁梓淇详细复盘其负责的实现部分，并反复追问具体的研究对象、实现途径及过程，显然对这块成果的技术细节还不太放心，想让对方当面盘清楚。</p>
+      </div>
+      <div class="tl-item"><span class="tl-time">39:26</span>
+        <p>针对API功能，宁梓淇解释当前设计是让用户选择预设的四种平台，以规避客户不愿申请API的情况。工网221江伊潭则将其理解为用户接入自有API的入口。</p>
+        <p>随后青禾指出双方理解存在偏差，强调他期望的是在admin后台管理用户注册、数据及文本总览。为消除分歧，他决定现场演示，直接拉出系统界面来对齐预期，比口头解释高效得多。</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 待办总览 ============ -->
+<section class="overview" id="overview">
+  <div class="sec-head">
+    <span class="sec-num">Σ</span>
+    <h2>待办总览</h2>
+  </div>
+  <div class="sec-meta">
+    <span>五次会待办合计 <b>24</b> 项（会议① 7 项 · 会议② 4 项 · 会议③ 0 项 · 会议④ 6 项 · 会议⑤ 7 项）</span>
+  </div>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>会议#</th><th>事项</th><th>负责人</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>开发通用API Key转换平台，兼容各类AI接口。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>寻找并汇总竞品平台的功能信息，形成需求单。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>升级六类文本的Skills，确保小范围可用。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>搭建Word编排引擎，支持PDF和Word格式识别。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>购买服务器并部署产品，计划下周完成上线。</td><td><span class="owner o-teal">邓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>完成在线需求文档的编辑与权限配置，明确近期计划。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-teal">会议①</span></td><td>下载并使用PPT Master，研究PPT生成功能。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-blue">会议②</span></td><td>本周末前完成第一版本的上线部署。</td><td><span class="owner o-teal">邓淇</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-blue">会议②</span></td><td>在需求表格中增加一列，用于向用户解释功能作用及利益。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-blue">会议②</span></td><td>调研GitHub等平台上的现有开源竞品，提取可借鉴的功能逻辑以完善系统。</td><td><span class="owner o-teal">邓淇</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-blue">会议②</span></td><td>研究公域与私域流量的搭建方法及具体的引流推广方式。</td><td><span class="owner o-red">嘘声</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>在管理后台开发AI服务配置平台，实现模型灵活切换。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>完善前端首页的免责声明与隐私承诺内容。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>线下测试开源竞品的公式生成Skill功能。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>梳理系统差距并输出开放需求表。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>作为用户代表，对需求文档进行对抗性审查。</td><td><span class="owner o-slate">工网221江伊潭</span></td></tr>
+        <tr><td><span class="badge-m m-amber">会议④</span></td><td>将会议纪要同步至项目组织群及知识库中。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>梳理当前项目与通用平台架构的差异，形成需求表与具体开发任务清单。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>基于分支开发一版可直接生成成品的试用版Demo供客户体验。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>作为用户视角体验Demo并进行审查。</td><td><span class="owner o-red">一谈</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>开发针对大专生、二本/一本学生、985/211学生的三类测试场景模板。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>将需求金字塔转化为更口语化的表达形式并重新制作图表。</td><td><span class="owner o-amber">青禾</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>测试平台是否支持多屏多电脑登录。</td><td><span class="owner o-blue">宁梓淇</span></td></tr>
+        <tr><td><span class="badge-m m-red">会议⑤</span></td><td>梳理并确认后端Admin管理入口及API平台接入的具体实现方式。</td><td><span class="owner o-amber">青禾</span><span class="owner o-blue">宁梓淇</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">根据元宝会议助手记录整理 · 原始 Markdown 见同目录 1.md–5.md</div>
+</footer>
+
+</body>
+</html>
