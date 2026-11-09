@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 文本编排工具 · 三次会议纪要梳理</title>
+<style>
+  :root{
+    --ink:#1b2430;
+    --ink-2:#3f4c5a;
+    --ink-3:#6b7885;
+    --line:#e2ded4;
+    --line-2:#efece4;
+    --paper:#fbfaf6;
+    --card:#ffffff;
+    --teal:#0f7566;
+    --teal-2:#12897a;
+    --teal-soft:#e7f2ef;
+    --amber:#b0631c;
+    --amber-soft:#faf0e2;
+    --red:#a4372c;
+    --red-soft:#fbeceb;
+    --blue:#2b5876;
+    --blue-soft:#eaf0f4;
+    --shadow:0 1px 2px rgba(27,36,48,.05), 0 8px 24px -16px rgba(27,36,48,.25);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(27,36,48,.025) 1px,transparent 1px);
+    background-size:100% 28px;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- 顶部 ---------- */
+  header.hero{padding:64px 0 40px;border-bottom:1px solid var(--line);}
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--teal);font-weight:600;margin-bottom:18px;
+  }
+  .kicker::before{content:"";width:26px;height:2px;background:var(--teal);display:block;}
+  h1{
+    font-size:clamp(28px,4.2vw,42px);
+    line-height:1.3;margin:0 0 14px;letter-spacing:-.01em;font-weight:700;
+  }
+  h1 em{font-style:normal;color:var(--teal);}
+  .ldeck{color:var(--ink-2);font-size:16px;max-width:760px;margin:0 0 26px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:5px 14px;font-size:12.5px;color:var(--ink-2);box-shadow:var(--shadow);
+  }
+  .chip b{color:var(--ink);font-weight:600;}
+
+  /* ---------- 导航 ---------- */
+  nav.toc{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,250,246,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none;}
+  nav.toc .wrap::-webkit-scrollbar{display:none;}
+  nav.toc a{
+    flex:0 0 auto;text-decoration:none;color:var(--ink-2);font-size:13px;
+    padding:5px 11px;border-radius:6px;white-space:nowrap;transition:.16s;
+  }
+  nav.toc a:hover{background:var(--teal-soft);color:var(--teal);}
+  nav.toc a .n{color:var(--teal);font-weight:600;margin-right:4px;font-variant-numeric:tabular-nums;}
+
+  /* ---------- 通用区块 ---------- */
+  section{padding:52px 0 8px;}
+  .sechead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+  .secno{
+    font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.06em;
+    font-variant-numeric:tabular-nums;padding-top:2px;
+  }
+  h2{font-size:22px;margin:0;font-weight:700;letter-spacing:-.005em;}
+  .secdesc{color:var(--ink-3);font-size:13.5px;margin:0 0 24px;padding-left:38px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:var(--shadow);
+  }
+  .grid{display:grid;gap:16px;}
+  .g2{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .g3{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .g4{grid-template-columns:repeat(4,minmax(0,1fr));}
+
+  /* ---------- 摘要 ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 18px;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+  .stat::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--teal);opacity:.5;}
+  .stat .v{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2;font-variant-numeric:tabular-nums;}
+  .stat .v small{font-size:13px;font-weight:500;color:var(--ink-2);margin-left:3px;}
+  .stat .k{font-size:12.5px;color:var(--ink-3);margin-top:2px;}
+
+  .concl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 4px;box-shadow:var(--shadow);}
+  .concl ol{list-style:none;counter-reset:c;margin:0;padding:0;}
+  .concl li{
+    counter-increment:c;display:flex;gap:16px;padding:16px 22px;
+    border-bottom:1px solid var(--line-2);
+  }
+  .concl li:last-child{border-bottom:0;}
+  .concl li::before{
+    content:"0" counter(c);flex:0 0 auto;font-size:13px;font-weight:700;color:var(--teal);
+    font-variant-numeric:tabular-nums;padding-top:3px;
+  }
+  .concl li p{margin:0;color:var(--ink-2);}
+  .concl li strong{color:var(--ink);font-weight:600;}
+
+  /* ---------- 会议时间线 ---------- */
+  .tl{position:relative;padding-left:34px;margin-top:6px;}
+  .tl::before{content:"";position:absolute;left:9px;top:8px;bottom:26px;width:1px;background:var(--line);}
+  .tlitem{position:relative;margin-bottom:18px;}
+  .tlitem::before{
+    content:"";position:absolute;left:-30px;top:22px;width:11px;height:11px;border-radius:50%;
+    background:var(--card);border:2px solid var(--teal);
+  }
+  .tlitem .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;}
+  .tag{
+    display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:5px;
+    background:var(--teal-soft);color:var(--teal);font-weight:600;letter-spacing:.02em;
+  }
+  .tag.gray{background:#f2efe8;color:var(--ink-3);font-weight:500;}
+  .tag.amber{background:var(--amber-soft);color:var(--amber);}
+  .tlitem h3{margin:0 0 6px;font-size:17px;font-weight:650;}
+  .tlitem .who{font-size:13px;color:var(--ink-3);margin:0 0 10px;}
+  .tlitem ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14px;}
+  .tlitem ul li{margin-bottom:4px;}
+  .verdict{
+    margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--paper);
+    border-left:2px solid var(--teal);font-size:13px;color:var(--ink-2);
+  }
+  .verdict b{color:var(--teal);font-weight:600;}
+
+  /* ---------- 演进 ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;align-items:stretch;}
+  .step{
+    background:var(--card);border:1px solid var(--line);padding:20px 22px;position:relative;
+  }
+  .step:nth-child(1){border-radius:14px 0 0 14px;}
+  .step:nth-child(3){border-radius:0 14px 14px 0;}
+  .step .sn{font-size:11.5px;letter-spacing:.12em;color:var(--ink-3);font-weight:600;}
+  .step h4{margin:6px 0 8px;font-size:16px;font-weight:650;}
+  .step p{margin:0;font-size:13.5px;color:var(--ink-2);}
+  .step .arrow{
+    position:absolute;right:-13px;top:50%;transform:translateY(-50%);z-index:2;
+    width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px;
+  }
+  .step:nth-child(3) .arrow{display:none;}
+
+  /* ---------- 流程 ---------- */
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:4px 0 18px;}
+  .fnode{
+    flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;text-align:left;
+  }
+  .fnode .fn{font-size:11px;color:var(--ink-3);letter-spacing:.08em;}
+  .fnode .ft{font-size:14px;font-weight:600;margin:2px 0 3px;}
+  .fnode .fd{font-size:12.5px;color:var(--ink-2);line-height:1.6;}
+  .fnode.acc{border-color:#cbe4dd;background:linear-gradient(180deg,#f4fbf9,#fff);}
+  .fsep{flex:0 0 auto;color:var(--teal);font-size:16px;font-weight:700;}
+  .principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+  .pr{background:var(--paper);border:1px solid var(--line-2);border-radius:10px;padding:14px 16px;}
+  .pr b{display:block;font-size:13.5px;margin-bottom:4px;}
+  .pr span{font-size:13px;color:var(--ink-2);}
+
+  /* ---------- 表格 ---------- */
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow);}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
+  thead th{
+    background:#f4f1ea;text-align:left;font-weight:600;color:var(--ink);
+    padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px;
+  }
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--ink-2);}
+  tbody tr:last-child td{border-bottom:0;}
+  tbody tr:hover{background:#fcfbf7;}
+  td b{color:var(--ink);font-weight:600;}
+  .own{display:inline-block;font-size:12px;padding:1px 8px;border-radius:4px;background:var(--blue-soft);color:var(--blue);white-space:nowrap;}
+  .own.d{background:var(--teal-soft);color:var(--teal);}
+  .own.x{background:var(--amber-soft);color:var(--amber);}
+  .own.t{background:#f2efe8;color:var(--ink-3);}
+  .src{font-size:12px;color:var(--ink-3);white-space:nowrap;}
+
+  /* ---------- 风险 ---------- */
+  .risk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;border-top:3px solid var(--amber);}
+  .risk.hi{border-top-color:var(--red);}
+  .risk .rh{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .lvl{font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px;letter-spacing:.04em;}
+  .lvl.h{background:var(--red-soft);color:var(--red);}
+  .lvl.m{background:var(--amber-soft);color:var(--amber);}
+  .risk h4{margin:0;font-size:14.5px;font-weight:650;}
+  .risk p{margin:0 0 6px;font-size:13px;color:var(--ink-2);}
+  .risk .act{font-size:12.5px;color:var(--teal);font-weight:500;}
+
+  /* ---------- 金字塔 ---------- */
+  .pyrwrap{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center;}
+  .pyr-note{font-size:13px;color:var(--ink-3);margin-top:10px;}
+  .layers{display:flex;flex-direction:column;gap:12px;}
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 16px;border-left:3px solid var(--teal);}
+  .layer .lh{font-size:13px;font-weight:650;margin-bottom:2px;}
+  .layer .lp{font-size:13px;color:var(--ink-2);}
+  .layer.dim{border-left-color:#c9c3b6;opacity:.8;}
+
+  /* ---------- 矩阵 ---------- */
+  .matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .quad{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:132px;}
+  .quad .qh{font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:8px;}
+  .quad ul{margin:0;padding-left:16px;font-size:13px;color:var(--ink-2);}
+  .quad li{margin-bottom:2px;}
+  .quad.q1{border-top:3px solid var(--red);} .quad.q1 .qh{color:var(--red);}
+  .quad.q2{border-top:3px solid var(--teal);} .quad.q2 .qh{color:var(--teal);}
+  .quad.q3{border-top:3px solid var(--amber);} .quad.q3 .qh{color:var(--amber);}
+  .quad.q4{border-top:3px solid #a9a394;} .quad.q4 .qh{color:var(--ink-3);}
+
+  /* ---------- 分歧 ---------- */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .issue .ih{display:flex;gap:8px;align-items:baseline;margin-bottom:8px;}
+  .issue .idx{font-size:12px;font-weight:700;color:var(--amber);}
+  .issue h4{margin:0;font-size:14.5px;font-weight:650;}
+  .views{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+  .vbox{background:var(--paper);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--ink-2);}
+  .vbox span{display:block;font-size:11px;color:var(--ink-3);margin-bottom:2px;letter-spacing:.04em;}
+  .issue .res{font-size:12.5px;color:var(--teal);font-weight:500;}
+
+  footer{margin-top:56px;border-top:1px solid var(--line);padding:26px 0 48px;font-size:12.5px;color:var(--ink-3);}
+  footer p{margin:0 0 6px;}
+
+  @media (max-width:900px){
+    .g2,.g3,.g4,.principles,.pyrwrap{grid-template-columns:1fr;}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .steps{grid-template-columns:1fr;}
+    .step{border-radius:12px!important;margin-bottom:12px;}
+    .step .arrow{display:none;}
+    .views{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .wrap{padding:0 18px;}
+    header.hero{padding:44px 0 30px;}
+    .stats{grid-template-columns:1fr;}
+    .secdesc{padding-left:0;}
+    .matrix{grid-template-columns:1fr;}
+  }
+  @media print{
+    nav.toc{display:none;}
+    body{background:#fff;}
+    body::before{display:none;}
+    .card,.tw,.concl,.step{box-shadow:none;}
+    section{page-break-inside:avoid;}
+    .rv{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Meeting Digest · 三次会议合并梳理</div>
+    <h1>AI 文本编排工具项目<br><em>三次会议纪要梳理</em></h1>
+    <p class="ldeck">三场会议围绕同一个项目展开：从内部方案与排期，到引入外部顾问讨论合规与商业化，再到锁定客户需求与差异化。本页把散落在三份纪要中的定位、需求、风险、待办重新归并，形成一份可执行的决策档案。</p>
+    <div class="chips">
+      <span class="chip"><b>3</b> 场会议</span>
+      <span class="chip"><b>3</b> 位参与者</span>
+      <span class="chip"><b>17</b> 项待办</span>
+      <span class="chip">开发进度 <b>60%–70%</b></span>
+      <span class="chip">整理日期 <b>2026-11-09</b></span>
+      <span class="chip">素材 <b>1.md / 2.md / 3.md</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#summary"><span class="n">01</span>核心结论</a>
+    <a href="#meetings"><span class="n">02</span>三次会议</a>
+    <a href="#positioning"><span class="n">03</span>定位演进</a>
+    <a href="#flow"><span class="n">04</span>交付流程</a>
+    <a href="#tech"><span class="n">05</span>技术需求</a>
+    <a href="#risk"><span class="n">06</span>风险合规</a>
+    <a href="#users"><span class="n">07</span>客户金字塔</a>
+    <a href="#growth"><span class="n">08</span>增长路径</a>
+    <a href="#todo"><span class="n">09</span>待办总表</a>
+    <a href="#priority"><span class="n">10</span>优先级矩阵</a>
+    <a href="#open"><span class="n">11</span>分歧待定</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- 01 核心结论 -->
+  <section id="summary">
+    <div class="sechead"><span class="secno">01</span><h2>核心结论</h2></div>
+    <p class="secdesc">三场会议串起来是一条主线：先把产品从“毕设工具”拔高成通用平台，再用合规话术重构商业模式，最后回到客户身上回答“凭什么买”。</p>
+
+    <div class="stats">
+      <div class="stat"><div class="v">3</div><div class="k">场会议 · 同一项目连续推进</div></div>
+      <div class="stat"><div class="v">60–70<small>%</small></div><div class="k">框架完成度（第二次会议口径）</div></div>
+      <div class="stat"><div class="v">6<small>类</small></div><div class="k">待升级的文本 Skills</div></div>
+      <div class="stat"><div class="v">60<small>%</small></div><div class="k">与开源竞品相关的合规关注点</div></div>
+    </div>
+
+    <div class="concl">
+      <ol>
+        <li><p><strong>产品定位：从“专属模板”转向“通用检索 + 定制交付”。</strong>剥离学校／单位属性，先当黑盒产出标准化通用内容，再按用户格式要求由 Agent 二次加工，形成“通用版 + 定制版”双输出。</p></li>
+        <li><p><strong>商业模式：从“卖成品”改为“卖服务”。</strong>不再直接售卖成体系的毕业论文文本，改为提供信息提取、模板填充与排版校验，规避代写的合规红线，同时保留收费能力。</p></li>
+        <li><p><strong>底层优先级：API 通用平台排在最前。</strong>单一 API 存在调用失败、超支与被断供风险，需做多接口 Key 转换与轮换机制；文档引擎则拆为“信息拆解”与“Word 编排”两个独立模块，为平台化铺路。</p></li>
+        <li><p><strong>客户答案：专治“懒”与“不会排版”。</strong>核心价值不在“帮你写内容”，而在“帮你省掉格式、图表、文献综述的苦活”，目标客群落在金字塔中低端的本科／普本学生。</p></li>
+        <li><p><strong>节奏：先上线验证，再补合规与推广。</strong>三次会议一致接受“粗糙 MVP 先跑通”的策略，上线时点被反复提到（下周内／15 号／本周末），但口径未统一，是当前最需要钉死的里程碑。</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 02 三次会议 -->
+  <section id="meetings">
+    <div class="sechead"><span class="secno">02</span><h2>三次会议一览</h2></div>
+    <p class="secdesc">原始纪要未标注日期，以下按文件序号还原推进顺序；主题与参会人取自各份纪要抬头。</p>
+
+    <div class="tl">
+      <div class="tlitem">
+        <div class="card">
+          <div class="meta"><span class="tag">第一次</span><span class="tag gray">项目方案与排期研讨</span><span class="tag gray">邓淇 · 宁梓淇</span></div>
+          <h3>搭骨架：定通用化方向，切开发任务，排上线时间</h3>
+          <p class="who">参会：邓淇、宁梓淇（另有元宝会议助手全程记录）</p>
+          <ul>
+            <li>确认产品走<strong>通用型版本</strong>，不再限定特定学校或单位的专属模板，改为基于大规模检索生成通用排版。</li>
+            <li>确立<strong>通用与定制双输出</strong>机制，并明确“以用户要求为最高标准”。</li>
+            <li>抛出三项核心开发需求：API 平台兼容、Word 文档引擎、PPT 生成（参考 PPT Master，先出 HTML 再截图）。</li>
+            <li>决定优先升级现有六类文本 Skills，保证小范围内先能用；通用化重构因难度大而<strong>暂时搁置</strong>，先优化现有功能抢上线。</li>
+            <li>敲定服务器采购与部署分工，同步推进宣传视频；营销只做小范围试水，并考虑拉“一堂”入伙负责运营。</li>
+          </ul>
+          <div class="verdict"><b>基调：</b>务实抢跑——“先落地再升级”，把“做产品”和“找方向”的活儿彻底拆开。</div>
+        </div>
+      </div>
+
+      <div class="tlitem">
+        <div class="card">
+          <div class="meta"><span class="tag">第二次</span><span class="tag gray">AI 论文辅助工具创业研讨</span><span class="tag amber">引入外部顾问</span></div>
+          <h3>补漏洞：合规红线、商业模式转型与获客路径</h3>
+          <p class="who">参会：邓淇、嘘声、宁梓淇</p>
+          <ul>
+            <li>邓淇向嘘声完整复盘项目：基于 AI Agent 的通用文本工具，用户上传文本或源码，Agent 提取信息点作为<strong>唯一信息源</strong>，生成任务书等六类文本，要求统一格式、符合逻辑框架、自动产出流程图／三线表等图表。</li>
+            <li>披露进度约 <strong>60%–70%</strong>，框架已成型但未上线，仅有宣传视频，计划本周末前上线首版。</li>
+            <li>嘘声直指代写论文属<strong>灰色地带</strong>，缺备案与资质极易被举报封号下架；邓淇随即提出转型方案——不卖成品，只做“信息提取 + 模板填充 + 排版”。</li>
+            <li>客群出现分歧：邓淇主张覆盖全体有汇报需求的大学生，嘘声主张避开高学历群体、主攻金字塔中低端。</li>
+            <li>嘘声贡献产品视角：需求表新增“作用／用户视角”列，把“Skill”通俗化为“功能”，并梳理运营上传到 QA 审核交付的全链路。</li>
+            <li>推广方向成型：熟人圈层与校内试点、小红书自媒体、GitHub 开源竞品调研与引流。</li>
+          </ul>
+          <div class="verdict"><b>基调：</b>被外部顾问“挤牙膏”式追问，把包装层剥掉，逼出真实业务内核——“帮你改东西”。</div>
+        </div>
+      </div>
+
+      <div class="tlitem">
+        <div class="card">
+          <div class="meta"><span class="tag">第三次</span><span class="tag gray">客户需求与差异化</span><span class="tag gray">邓淇 · 嘘声 · 宁梓淇</span></div>
+          <h3>找理由：客户为什么非买不可</h3>
+          <p class="who">参会：邓淇、嘘声、宁梓淇</p>
+          <ul>
+            <li>宁梓淇把产品直白定义为“<strong>懒人式</strong>”论文生成工具：上传源码即可一次性拿到成品，不必反复与 AI 对话修改。</li>
+            <li>邓淇补足动机：普本院校学生缺写作经验，在格式排版、文献综述、表格填充上耗时极长，甚至要重新学 Word——核心价值从“生成内容”降维到“<strong>解决排版焦虑</strong>”。</li>
+            <li>宁梓淇提炼痛点三条：<strong>懒得写、懒得学、懒得反复打磨</strong>；嘘声用客户金字塔把三类人分层拆开。</li>
+            <li>“论文转 PPT”增值服务被提议后被否：对论文有要求的用户更愿自己调教 AI，与服务定位错位。</li>
+            <li>收尾定了两件大事：<strong>完成产品上线 + 获取官方认证</strong>；日常技术与运营由邓淇、宁梓淇推进，重大事项再拉三人会议。</li>
+          </ul>
+          <div class="verdict"><b>基调：</b>回归用户——“人唯一不变的就是懒”，用固定框架替代重复劳动。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 定位演进 -->
+  <section id="positioning">
+    <div class="sechead"><span class="secno">03</span><h2>产品定位的三级跳</h2></div>
+    <p class="secdesc">三次会议对“这是什么产品”的回答逐层抬升，最终落在平台化服务上。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="sn">起点 · 原始设想</div>
+        <h4>毕设文本生成网站</h4>
+        <p>面向毕业设计的文本生成工具，靠“一键出稿”直接变现，规模与合规空间都受限。</p>
+        <div class="arrow">›</div>
+      </div>
+      <div class="step">
+        <div class="sn">第一次 · 抬升</div>
+        <h4>通用文本编排工具</h4>
+        <p>剥离学校／单位属性，做通用模板 + 定制化二次加工，支持论文、汇报、比赛等多类文本。</p>
+        <div class="arrow">›</div>
+      </div>
+      <div class="step">
+        <div class="sn">第二次 · 转向</div>
+        <h4>信息编排服务平台</h4>
+        <p>不卖成品卖服务：信息提取、模板填充、格式排版与校验，用“代编排”规避代写风险。</p>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:18px;">
+      <div class="card">
+        <h4 style="margin:0 0 6px;font-size:14.5px;">通用版与定制版的双输出</h4>
+        <p style="margin:0;font-size:13.5px;color:var(--ink-2);">系统先把项目当黑盒，产出标准化通用内容；再基于用户上传的格式要求（或定制模板）由 Agent 二次加工，交付定制文档。若用户已提前给出模板，则跳过通用模板环节，直接加工。</p>
+      </div>
+      <div class="card">
+        <h4 style="margin:0 0 6px;font-size:14.5px;">以用户要求为最高标准</h4>
+        <p style="margin:0;font-size:13.5px;color:var(--ink-2);">若用户要求的格式比通用模板更简单，优先交付用户要求的部分，把多出来的内容作为“建议项”附上，既保底又留灵活度——即“基础交付 + 增值建议”。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 交付流程 -->
+  <section id="flow">
+    <div class="sechead"><span class="secno">04</span><h2>标准交付流程</h2></div>
+    <p class="secdesc">第一次会议对工作流做过一次“做减法”，最终收敛为四段式。</p>
+
+    <div class="flow">
+      <div class="fnode"><div class="fn">输入</div><div class="ft">源码 / 资料 + 格式要求</div><div class="fd">用户上传项目源码或文本资料，并提出格式、结构要求。</div></div>
+      <div class="fsep">→</div>
+      <div class="fnode"><div class="fn">提取</div><div class="ft">核心信息点</div><div class="fd">Agent 抽取唯一信息源，锁定后续全部生成内容的依据。</div></div>
+      <div class="fsep">→</div>
+      <div class="fnode acc"><div class="fn">编排</div><div class="ft">通用内容生成</div><div class="fd">按标准框架产出统一格式、逻辑自洽的文本，并自动配套流程图、三线表等图表。</div></div>
+      <div class="fsep">→</div>
+      <div class="fnode acc"><div class="fn">交付</div><div class="ft">定制加工 + 建议项</div><div class="fd">按用户模板二次加工输出，超出部分作为建议项供用户取舍。</div></div>
+    </div>
+
+    <div class="principles">
+      <div class="pr"><b>单一信息源</b><span>所有文本共用同一套提取结果，从源头规避数据前后冲突。</span></div>
+      <div class="pr"><b>格式即交付物</b><span>统一格式、逻辑框架、图表自动生成，是用户“怕麻烦”的核心解药。</span></div>
+      <div class="pr"><b>人工留出口</b><span>用户可在推荐内容基础上修改或替换，最终审阅权留在用户手里。</span></div>
+    </div>
+  </section>
+
+  <!-- 05 技术需求 -->
+  <section id="tech">
+    <div class="sechead"><span class="secno">05</span><h2>技术需求清单</h2></div>
+    <p class="secdesc">把三次会议提到的开发项归并去重，按依赖关系排序。</p>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th style="width:26%">模块</th><th style="width:44%">会议要求</th><th style="width:14%">负责</th><th style="width:16%">来源</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>通用 API Key 转换平台</b></td>
+            <td>兼容各类 AI 接口，解决测试难题与后续接口失效、付费问题；建立多 Key 轮换机制，风险优先级最高。</td>
+            <td><span class="own">宁梓淇</span></td>
+            <td class="src">第一 · 二</td>
+          </tr>
+          <tr>
+            <td><b>Word 编排引擎</b></td>
+            <td>使 Agent 能准确识别并处理 PDF、Word 等不同文档格式，是通用功能的前置条件。</td>
+            <td><span class="own">宁梓淇</span></td>
+            <td class="src">第一</td>
+          </tr>
+          <tr>
+            <td><b>文档引擎模块拆分</b></td>
+            <td>把现有 Skill 拆为“信息拆解与组织”“Word 文本编排”两个独立模块，适配平台化并支持通用模板调用。</td>
+            <td><span class="own">宁梓淇</span></td>
+            <td class="src">第二</td>
+          </tr>
+          <tr>
+            <td><b>六类文本 Skills 升级</b></td>
+            <td>优先完成现有六类文本的能力升级，保证产品在小范围内可正常使用，是推广前的最低门槛。</td>
+            <td><span class="own d">邓淇</span></td>
+            <td class="src">第一</td>
+          </tr>
+          <tr>
+            <td><b>PPT 生成</b></td>
+            <td>参考 PPT Master 等开源框架，走“先生成 HTML 再截取”的实现路径；其效果高度依赖底层模型能力。</td>
+            <td><span class="own">宁梓淇</span></td>
+            <td class="src">第一</td>
+          </tr>
+          <tr>
+            <td><b>数据库与部署形态</b></td>
+            <td>前期直接单机部署、极简架构，先跑通闭环再谈扩展。</td>
+            <td><span class="own t">待定</span></td>
+            <td class="src">第二</td>
+          </tr>
+          <tr>
+            <td><b>需求表与客户端命名</b></td>
+            <td>内部表格是后端协议，需另建一张“用户视角”表；术语“Skill”统一通俗化为“功能”，降低理解门槛。</td>
+            <td><span class="own">宁梓淇</span></td>
+            <td class="src">第一 · 二</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 06 风险合规 -->
+  <section id="risk">
+    <div class="sechead"><span class="secno">06</span><h2>风险与合规</h2></div>
+    <p class="secdesc">第二次会议的核心增量：外脑把合规摆到了台面上，并给出了转型出路。</p>
+
+    <div class="grid g2">
+      <div class="risk hi">
+        <div class="rh"><span class="lvl h">高风险</span><h4>直接代写论文的合规红线</h4></div>
+        <p>直接生成整套毕业设计文本属灰色地带，缺少合规认证与备案时，极易因举报被平台下架或承担法律责任。</p>
+        <p class="act">应对：转型为信息提取与排版服务，并完成网站备案与资质办理。</p>
+      </div>
+      <div class="risk hi">
+        <div class="rh"><span class="lvl h">高风险</span><h4>开源协议的侵权风险</h4></div>
+        <p>借鉴 GitHub 开源项目功能时需保留私有代码；若商业化后闭源使用开源代码，存在协议纠纷风险。</p>
+        <p class="act">应对：只做功能层“仿造”而非底层逆向，明确代码边界与许可范围。</p>
+      </div>
+      <div class="risk">
+        <div class="rh"><span class="lvl m">中风险</span><h4>被通用 AI 平替</h4></div>
+        <p>大学生普遍会用 AI，若产品只提供“生成内容”，很容易被免费工具覆盖。</p>
+        <p class="act">应对：用“省去反复修改与排版”的性价比构建护城河。</p>
+      </div>
+      <div class="risk">
+        <div class="rh"><span class="lvl m">中风险</span><h4>开源引流暴露操作逻辑</h4></div>
+        <p>用开源前端换 GitHub Star 的提议被否——前端一开源，操作逻辑即被完整暴露、易被逆向。</p>
+        <p class="act">应对：改为反向借鉴同类项目分支，不开源核心链路。</p>
+      </div>
+      <div class="risk">
+        <div class="rh"><span class="lvl m">中风险</span><h4>单一 API 断供与超支</h4></div>
+        <p>全部能力压在一个接口上，一旦失效或计费异常，业务直接停摆。</p>
+        <p class="act">应对：API 通用平台 + 多 Key 轮换，作为第一优先级开发。</p>
+      </div>
+      <div class="risk">
+        <div class="rh"><span class="lvl m">中风险</span><h4>错过窗口期被竞品抢先</h4></div>
+        <p>竞品可能靠营销抢市场，“酒香也怕巷子深”，产品与营销必须双线并行。</p>
+        <p class="act">应对：加快开发、尽早上线，宣传视频与研发同步推进。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 客户金字塔 -->
+  <section id="users">
+    <div class="sechead"><span class="secno">07</span><h2>客户画像与差异化</h2></div>
+    <p class="secdesc">第三次会议把“谁会买”拆成了金字塔，第二次会议已定调：优先主攻中低端。</p>
+
+    <div class="pyrwrap">
+      <div>
+        <svg viewBox="0 0 660 340" width="100%" role="img" aria-label="客户金字塔：三层用户需求分层">
+          <defs>
+            <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#12897a"/><stop offset="1" stop-color="#0f7566"/>
+            </linearGradient>
+          </defs>
+          <!-- 顶层 -->
+          <polygon points="196,46 464,46 330,6" fill="#cfe6e0"/>
+          <polygon points="196,46 464,46 490,118 170,118" fill="#dceee9" stroke="#bfdcd4" stroke-width="1"/>
+          <text x="330" y="72" text-anchor="middle" font-size="14" font-weight="600" fill="#0f5c4f">第三层 · 懂架构且愿意写</text>
+          <text x="330" y="95" text-anchor="middle" font-size="12" fill="#3f6d64">懒得改：按导师反馈反复修改</text>
+          <!-- 中层 -->
+          <polygon points="170,126 490,126 524,198 136,198" fill="#a8d2c9" stroke="#8fc3b8" stroke-width="1"/>
+          <text x="330" y="152" text-anchor="middle" font-size="14" font-weight="600" fill="#0b4038">第二层 · 懂架构但懒得写</text>
+          <text x="330" y="175" text-anchor="middle" font-size="12" fill="#28564e">有技术、没耐心，要的是“一键出稿”</text>
+          <!-- 底层 -->
+          <polygon points="136,206 524,206 600,320 60,320" fill="url(#gb)" stroke="#0c6a5d" stroke-width="1"/>
+          <text x="330" y="238" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">第一层 · 懒人基本盘（主战场）</text>
+          <text x="330" y="264" text-anchor="middle" font-size="12.5" fill="#dff4ef">本科 / 普本学生 · 缺写作经验 · 不熟 Word 与排版</text>
+          <text x="330" y="288" text-anchor="middle" font-size="12.5" fill="#dff4ef">懒得写 · 懒得学 · 懒得反复打磨</text>
+        </svg>
+        <p class="pyr-note">图中金字塔为按会议口述结构自绘的示意图，用于说明分层逻辑，不代表实际用户占比。</p>
+      </div>
+
+      <div class="layers">
+        <div class="layer">
+          <div class="lh">核心价值：解决排版焦虑，而不是替你思考</div>
+          <div class="lp">统一格式、逻辑框架、自动配图表（流程图、核心框架、三线表），把最耗时的苦活自动化。</div>
+        </div>
+        <div class="layer">
+          <div class="lh">差异化：省掉“反复打磨”这一环</div>
+          <div class="lp">对“懒得改”的学生，产品充当师生之间的传话筒：按导师反馈批量修订，避免一次次重开对话。</div>
+        </div>
+        <div class="layer dim">
+          <div class="lh">明确不做的：高要求用户增值服务</div>
+          <div class="lp">“论文转 PPT”一类增值项被否——目标用户不愿付费打磨，高要求用户则自己调教 AI。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 增长 -->
+  <section id="growth">
+    <div class="sechead"><span class="secno">08</span><h2>增长路径</h2></div>
+    <p class="secdesc">从熟人裂变到自媒体，再到技术社区，三层递进；核心原则是“先有产品再谈推广”。</p>
+
+    <div class="grid g3">
+      <div class="card">
+        <div class="tag" style="margin-bottom:8px;">第一层 · 熟人</div>
+        <h4 style="margin:0 0 6px;font-size:15px;">校内试点与老同学圈层</h4>
+        <p style="margin:0;font-size:13px;color:var(--ink-2);">从自身院校起步，小范围测试产品效果、积累初始用户；早期靠核心骨干拉客源，跑通后再下放管理权并招新。</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="margin-bottom:8px;">第二层 · 自媒体</div>
+        <h4 style="margin:0 0 6px;font-size:15px;">小红书等平台合规展示</h4>
+        <p style="margin:0;font-size:13px;color:var(--ink-2);">以“产品自测／功能演示”的合规口径展示能力，规避代写话术；嘘声负责研究公域与私域的具体搭建方法。</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="margin-bottom:8px;">第三层 · 技术社区</div>
+        <h4 style="margin:0 0 6px;font-size:15px;">GitHub 竞品调研与借力</h4>
+        <p style="margin:0;font-size:13px;color:var(--ink-2);">盘点同类开源项目功能以查漏补缺；直接开源前端换 Star 的方案被否，改为借鉴分支思路。</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+      <div style="flex:1 1 260px;">
+        <div style="font-size:12px;color:var(--ink-3);letter-spacing:.06em;margin-bottom:4px;">转化预期</div>
+        <div style="font-size:14px;color:var(--ink-2);">“100 人转化 10 人”的试水目标被嘘声判定过高，试错成本需要重新校准；推广的前提是先有能跑通的成品。</div>
+      </div>
+      <div style="flex:0 0 1px;background:var(--line);align-self:stretch;"></div>
+      <div style="flex:1 1 260px;">
+        <div style="font-size:12px;color:var(--ink-3);letter-spacing:.06em;margin-bottom:4px;">团队分工</div>
+        <div style="font-size:14px;color:var(--ink-2);">日常技术与运营由邓淇、宁梓淇推进；嘘声聚焦数据分析与方法论，重大事项拉三人会议同步。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 待办 -->
+  <section id="todo">
+    <div class="sechead"><span class="secno">09</span><h2>待办事项总表</h2></div>
+    <p class="secdesc">三份纪要的去重合并结果，含来源场次与建议优先级。</p>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th style="width:5%">#</th><th style="width:42%">事项</th><th style="width:20%">负责人</th><th style="width:11%">来源</th><th style="width:22%">期限 / 备注</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><b>通用 API Key 转换平台</b>，多接口兼容 + 轮换机制</td><td><span class="own">宁梓淇</span></td><td class="src">一</td><td>最高优先级，先于其他功能</td></tr>
+          <tr><td>2</td><td><b>Word 编排引擎</b>，支持 PDF / Word 多格式识别</td><td><span class="own">宁梓淇</span></td><td class="src">一</td><td>通用功能前置条件</td></tr>
+          <tr><td>3</td><td><b>六类文本 Skills 升级</b>，保证小范围可用</td><td><span class="own d">邓淇</span></td><td class="src">一</td><td>推广前的最低门槛</td></tr>
+          <tr><td>4</td><td>文档引擎拆分：信息拆解与组织 / Word 文本编排</td><td><span class="own">宁梓淇</span></td><td class="src">二</td><td>平台化前提</td></tr>
+          <tr><td>5</td><td>PPT 生成功能，参考 PPT Master，先出 HTML 再截取</td><td><span class="own">宁梓淇</span></td><td class="src">一</td><td>研究性质，不阻塞上线</td></tr>
+          <tr><td>6</td><td>消化剩余 <b>3 项新增修改需求</b></td><td><span class="own">宁梓淇</span></td><td class="src">一</td><td>开发阶段收尾</td></tr>
+          <tr><td>7</td><td>需求方案表改造：补“作用 / 用户视角”列，术语通俗化</td><td><span class="own">宁梓淇</span></td><td class="src">一 · 二</td><td>方案细节与验收由本人主导</td></tr>
+          <tr><td>8</td><td>竞品调研（含 GitHub 开源项目），产出需求单</td><td><span class="own d">邓淇</span> <span class="own">宁梓淇</span></td><td class="src">一 · 二</td><td>承诺会后两日内出成果</td></tr>
+          <tr><td>9</td><td>服务器采购与产品部署上线</td><td><span class="own d">邓淇</span>采购 <span class="own">宁梓淇</span>部署</td><td class="src">一</td><td>原定下周内 / 15 号上线</td></tr>
+          <tr><td>10</td><td><b>网站备案与合规资质</b></td><td><span class="own t">待指派</span></td><td class="src">二</td><td>上线前必办，时点存争议</td></tr>
+          <tr><td>11</td><td>数据库单机部署，极简架构先跑通</td><td><span class="own t">待指派</span></td><td class="src">二</td><td>与上线同步</td></tr>
+          <tr><td>12</td><td>宣传视频与上线物料</td><td><span class="own">宁梓淇</span></td><td class="src">一</td><td>已重构，向意向用户展示全貌</td></tr>
+          <tr><td>13</td><td>营销策略制定，联系“一堂”入伙负责营销</td><td><span class="own d">邓淇</span> <span class="own">宁梓淇</span></td><td class="src">一</td><td>待对方下班后沟通</td></tr>
+          <tr><td>14</td><td>公域 / 私域流量搭建与具体引流方式研究</td><td><span class="own x">嘘声</span></td><td class="src">二</td><td>需先学实操</td></tr>
+          <tr><td>15</td><td>熟人圈层与校内小范围试点</td><td><span class="own t">团队</span></td><td class="src">二 · 三</td><td>产品可用后启动</td></tr>
+          <tr><td>16</td><td>基于历史纪要输出汇总文档</td><td><span class="own">宁梓淇</span></td><td class="src">三</td><td>即本页</td></tr>
+          <tr><td>17</td><td>梳理需嘘声协助的事项清单</td><td><span class="own t">团队</span></td><td class="src">三</td><td>会后同步</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10 优先级 -->
+  <section id="priority">
+    <div class="sechead"><span class="secno">10</span><h2>优先级矩阵</h2></div>
+    <p class="secdesc">第一次会议提出按“重要且紧急”四象限切分任务，此处把全部待办按该框架落位。</p>
+
+    <div class="matrix">
+      <div class="quad q1">
+        <div class="qh">重要 · 紧急 ｜ 立即做</div>
+        <ul>
+          <li>API 通用平台（断供风险，卡住全部调用）</li>
+          <li>服务器采购与部署上线</li>
+          <li>六类文本 Skills 升级</li>
+          <li>需求方案表改造与剩余 3 项修改</li>
+          <li>竞品调研需求单</li>
+        </ul>
+      </div>
+      <div class="quad q2">
+        <div class="qh">重要 · 不紧急 ｜ 排期做</div>
+        <ul>
+          <li>Word 编排引擎与文档引擎拆分</li>
+          <li>网站备案与合规资质</li>
+          <li>公域 / 私域引流方法论</li>
+          <li>营销策略与运营人选</li>
+        </ul>
+      </div>
+      <div class="quad q3">
+        <div class="qh">紧急 · 不重要 ｜ 有人就做</div>
+        <ul>
+          <li>宣传视频与上线物料</li>
+          <li>客户端的命名与界面文案</li>
+          <li>熟人圈层试点启动</li>
+        </ul>
+      </div>
+      <div class="quad q4">
+        <div class="qh">不重要 · 不紧急 ｜ 暂缓</div>
+        <ul>
+          <li>PPT 生成（依赖底层模型能力）</li>
+          <li>“成长年度”等功能（待竞品调研后再评估）</li>
+          <li>论文转 PPT 增值服务（已否决）</li>
+          <li>通用化整体重构（已明确搁置）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 分歧 -->
+  <section id="open">
+    <div class="sechead"><span class="secno">11</span><h2>尚未收敛的分歧</h2></div>
+    <p class="secdesc">三次会议留下了五处口径不一致，是下次会议需要当场拍板的事项。</p>
+
+    <div class="grid g2">
+      <div class="issue">
+        <div class="ih"><span class="idx">01</span><h4>上线时间有三个版本</h4></div>
+        <div class="views">
+          <div class="vbox"><span>第一次</span>“下周内完成部署上线”“15 号上线”</div>
+          <div class="vbox"><span>第二次</span>“本周末前上线第一版”</div>
+        </div>
+        <div class="res">待办：统一为一个里程碑日期，并倒推备案、部署、物料的完成节点。</div>
+      </div>
+
+      <div class="issue">
+        <div class="ih"><span class="idx">02</span><h4>目标客群边界</h4></div>
+        <div class="views">
+          <div class="vbox"><span>邓淇</span>覆盖全体有汇报需求的大学生</div>
+          <div class="vbox"><span>嘘声</span>避开高学历，主攻金字塔中低端</div>
+        </div>
+        <div class="res">结论倾向中低端，但正式口径未落地到对外文案。</div>
+      </div>
+
+      <div class="issue">
+        <div class="ih"><span class="idx">03</span><h4>合规是前置还是后补</h4></div>
+        <div class="views">
+          <div class="vbox"><span>嘘声</span>先取得许可与备案，再铺开推广</div>
+          <div class="vbox"><span>邓淇</span>先跑通功能看市场反馈，同步补备案</div>
+        </div>
+        <div class="res">暂定“走一步看一步”，风险敞口仍留在团队身上。</div>
+      </div>
+
+      <div class="issue">
+        <div class="ih"><span class="idx">04</span><h4>开源与引流的取舍</h4></div>
+        <div class="views">
+          <div class="vbox"><span>嘘声</span>删私有代码后开源前端，换 GitHub Star</div>
+          <div class="vbox"><span>邓淇 / 宁梓淇</span>暴露操作逻辑且存在闭源侵权风险</div>
+        </div>
+        <div class="res">当前结论：不开源核心链路，只借鉴同类项目分支。</div>
+      </div>
+
+      <div class="issue">
+        <div class="ih"><span class="idx">05</span><h4>通用化重构：搁置还是必须</h4></div>
+        <div class="views">
+          <div class="vbox"><span>第一次</span>难度大，先优化现有功能、抢上线</div>
+          <div class="vbox"><span>第二次</span>文档引擎拆分列为平台化前提</div>
+        </div>
+        <div class="res">两处口径需再对齐：重构是“上线后做”还是“上线前必须做”。</div>
+      </div>
+
+      <div class="issue">
+        <div class="ih"><span class="idx">06</span><h4>术语统一</h4></div>
+        <div class="views">
+          <div class="vbox"><span>内部</span>“Skill / 六类文本 / 需求表”为后端协议语言</div>
+          <div class="vbox"><span>对外</span>“功能 / 一键生成 / 排版服务”为用户视角</div>
+        </div>
+        <div class="res">已定方向：内部表保留技术术语，另建一张用户视角表对客。</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap" style="padding:0;">
+      <p><b>整理说明：</b>本页依据同目录下 <code>1.md</code>、<code>2.md</code>、<code>3.md</code> 三份会议纪要（含元宝会议助手逐段记录）归并整理，事实、人名、时间与任务分工均取自原文，未作推断性补充。</p>
+      <p>原纪要中“一堂”另有一处写作“一谈”，本页统一为“一堂”；三次会议原始记录均未标注具体日期，顺序按文件序号排列。</p>
+      <p>统计数字（会议 3 场、待办 17 项、进度 60%–70%）分别来自纪要抬头、待办去重合并结果与第二次会议的进度自述。</p>
+    </div>
+  </footer>
+
+</main>
+
+</body>
+</html>

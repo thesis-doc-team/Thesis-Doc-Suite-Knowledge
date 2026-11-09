@@ -1,0 +1,145 @@
+{
+  "package": "Thesis Doc Suite Knowledge V1.0",
+  "date": "2026-11-09",
+  "source_files": [
+    "项目介绍(1).md",
+    "三次会议纪要汇总.html"
+  ],
+  "files": [
+    {
+      "path": "00-总览与索引/知识导航与Agent使用规则.md",
+      "bytes": 2350,
+      "sha256": "86e39664af29de671e92e73482aa3ca588ab010b36c96bce14cdec06a1df6320"
+    },
+    {
+      "path": "01-产品战略/产品定位与核心价值.md",
+      "bytes": 2103,
+      "sha256": "3b038f02ba18ca1c27892e540183da5ee84a9c621e1f4b81fcf8c5ee98d6098d"
+    },
+    {
+      "path": "01-产品战略/首期与长期边界.md",
+      "bytes": 2466,
+      "sha256": "e65c113b8c890bce08d8b50c7fe70954fb67d6fa2e3ecc273326367b39b8b103"
+    },
+    {
+      "path": "02-客户与市场/使用场景与替代方案.md",
+      "bytes": 1516,
+      "sha256": "76ff2cb7364e53f5435ebd123ffe8e6fa098d902fc19e7414673b95504fdf4cb"
+    },
+    {
+      "path": "02-客户与市场/用户需求金字塔与待验证假设.md",
+      "bytes": 2047,
+      "sha256": "c57277d0d7e602869545182dcc50b64674a272a69f0a2c137e25e7512cbc9653"
+    },
+    {
+      "path": "03-产品需求与体验/权益任务与版本规则.md",
+      "bytes": 2621,
+      "sha256": "18f82877eb47f9077571f92c812979fa939f16555f6b194fe70e9965fa2b9e68"
+    },
+    {
+      "path": "03-产品需求与体验/首期业务流程与交互.md",
+      "bytes": 2568,
+      "sha256": "ee3b69ff56b0ad43e320a72a57c50a7b3617855238f3b4b5ddda0d99ee64c699"
+    },
+    {
+      "path": "04-平台架构与场景体系/信息资产与可追溯机制.md",
+      "bytes": 1721,
+      "sha256": "a580057881e8b22900c92475b034a079088b13f469d87c58fba84d110d099f08"
+    },
+    {
+      "path": "04-平台架构与场景体系/场景插件与AI自定义场景.md",
+      "bytes": 2385,
+      "sha256": "56b6175559473e05b5f1d8fe67f0dfdd44c1eb8a55387e0c0645fbe597575168"
+    },
+    {
+      "path": "04-平台架构与场景体系/通用平台能力与工程复用.md",
+      "bytes": 2211,
+      "sha256": "29ed77dcbc7387683346816a353b6995a47ab969a36c3e694b8efee074783393"
+    },
+    {
+      "path": "04-平台架构与场景体系/通用框架库与模板优先级.md",
+      "bytes": 2905,
+      "sha256": "ec4eb849be80325dfd64be91816189fea08400010f133304fd59f0980bc9b70b"
+    },
+    {
+      "path": "05-商业与增长/商业模式与成本测算.md",
+      "bytes": 2106,
+      "sha256": "81bc85c6a40ce40dfa2d9f4f52ff1de36707e138d14a1c2a8bb2f3b20e78fb77"
+    },
+    {
+      "path": "05-商业与增长/高校试点和反馈指标.md",
+      "bytes": 2748,
+      "sha256": "4ff8af405dc67aa05116dd5fad1e53f980e72b2cafe26fd78cfef8269e69e5b0"
+    },
+    {
+      "path": "06-质量与合规/上线合规检查表.md",
+      "bytes": 5697,
+      "sha256": "aacb143c489d5176c6b70f4b69395e3173d4caa8e0bf028896f1fd608c80369c"
+    },
+    {
+      "path": "06-质量与合规/中国大陆网站合规执行手册.md",
+      "bytes": 27119,
+      "sha256": "a65cb4d5cae5a9d6740c1cb3b9ffa9c2482863e2ff4b2648d396cf9bb28a7fff"
+    },
+    {
+      "path": "06-质量与合规/内部验收矩阵.md",
+      "bytes": 4742,
+      "sha256": "f1a05001c317658c570cfeefb875bc14eaabef491c7d5a1b9518dd91f3eeaac4"
+    },
+    {
+      "path": "06-质量与合规/合规结论与风险优先级速览.md",
+      "bytes": 2430,
+      "sha256": "3593e3b40c497360b46da6cc7f46345b543a1b8f838e33af5d9f0e3ebe28a3fa"
+    },
+    {
+      "path": "06-质量与合规/数据安全与技术控制.md",
+      "bytes": 2657,
+      "sha256": "2c67c22b0207cf3dd63e2c2ad7e30e35461247fad5aa45668e0d2b33723b81b8"
+    },
+    {
+      "path": "06-质量与合规/法规官方来源索引.md",
+      "bytes": 5870,
+      "sha256": "b00f392637ed5b4ad5b1b93aba53507ab6a1b9d9651cf7069f7d76d43beb450f"
+    },
+    {
+      "path": "07-发展路线/工程差距核查指引.md",
+      "bytes": 1493,
+      "sha256": "b41144c61399105f7259bd27b767033c0fc9529dea6852386860a88e0d8f78fa"
+    },
+    {
+      "path": "07-发展路线/阶段路线与准入门槛.md",
+      "bytes": 2735,
+      "sha256": "06b8ffe2dd15bca16ec2a6c933a69e980bf440d71baf02d687fc54bc17327bf6"
+    },
+    {
+      "path": "08-决策与证据/决策日志.md",
+      "bytes": 4161,
+      "sha256": "3c5a0e41c05696ca965566bd17b3841a0dc24378796e98c04310f321ea549053"
+    },
+    {
+      "path": "08-决策与证据/原始资料/三次会议纪要汇总.html",
+      "bytes": 46153,
+      "sha256": "dcd2230b5e46582b16d8a1830c2a83baf5e09a5c12f714eb957091165efa4fc9"
+    },
+    {
+      "path": "08-决策与证据/原始资料/项目介绍(1).md",
+      "bytes": 19691,
+      "sha256": "b042ed48d8f2af8e907bb38c77596aba17d5af7c9812f5ca3e5ee8c93b13b185"
+    },
+    {
+      "path": "08-决策与证据/原始资料与冲突处理说明.md",
+      "bytes": 1922,
+      "sha256": "af3f1bde233d5ed22e3e182fed137de932ba37c5678ad8495d775f09444e8740"
+    },
+    {
+      "path": "08-决策与证据/待验证及主管部门咨询.md",
+      "bytes": 3398,
+      "sha256": "38cbbfb6c82192f4576e270d0a2d6e624badf4026ad36f3247d2f256fc58ea17"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5140,
+      "sha256": "cf743a481c85b936d1433abbf056a51aedcf5b75a2c4beb58c5165c93ba1c2e5"
+    }
+  ]
+}
