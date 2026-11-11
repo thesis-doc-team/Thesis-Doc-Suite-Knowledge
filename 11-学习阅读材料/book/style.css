@@ -1,0 +1,419 @@
+/* 创业七章 · 书排版
+   纸感长文阅读版式：单栏、宽行距、宋体正文、朱红与墨绿两色标注 */
+
+:root {
+  --paper: #FAF7F0;
+  --paper2: #F2ECDE;
+  --ink: #1F1C17;
+  --muted: #6F675A;
+  --faint: #9A9080;
+  --rule: #DCD3C0;
+  --rule2: #C9BEA6;
+  --red: #A83E2A;
+  --green: #2C5C46;
+  --blue: #2A3F5F;
+  --shadow: rgba(31, 28, 23, 0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
+  font-size: 17.5px;
+  line-height: 2.0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ 顶部：进度条 + 书眉 ============ */
+.progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0;
+  background: var(--red); z-index: 50; transition: width .1s linear;
+}
+.bookbar {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 10px max(20px, calc(50vw - 360px));
+}
+.bb-home {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.8rem; letter-spacing: 0.2em; color: var(--ink);
+  text-decoration: none; white-space: nowrap;
+}
+.bb-home:hover { color: var(--red); }
+.bb-nav { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.bb-nav a {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.74rem; color: var(--faint); text-decoration: none;
+  width: 26px; height: 26px; line-height: 26px; text-align: center;
+  border-radius: 50%; transition: color .12s, background .12s;
+}
+.bb-nav a:hover { color: var(--red); background: var(--paper2); }
+.bb-nav a.cur { background: var(--ink); color: var(--paper); }
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 26px 90px;
+}
+
+/* ============ 章节扉页 ============ */
+.chapter-head { padding: 76px 0 40px; border-bottom: 3px double var(--rule2); }
+.ch-no {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.72rem; letter-spacing: 0.38em; color: var(--red);
+  margin-bottom: 20px;
+}
+.chapter-head h1 {
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
+  font-size: clamp(2rem, 6vw, 2.9rem);
+  font-weight: 700; line-height: 1.32; letter-spacing: 0.03em;
+}
+.ch-station {
+  display: inline-block; margin-top: 14px;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.78rem; letter-spacing: 0.16em; color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 40%, var(--rule));
+  border-radius: 999px; padding: 3px 14px;
+}
+.ch-lead {
+  margin-top: 26px; font-size: 1.02rem; color: var(--muted); line-height: 1.95;
+}
+
+/* ============ 正文 ============ */
+main h2 {
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
+  font-size: 1.42rem; font-weight: 700; line-height: 1.55;
+  margin: 2.9em 0 0.9em; letter-spacing: 0.02em;
+}
+main h2 .secno {
+  display: block; line-height: 1.3;
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; font-weight: 400; letter-spacing: 0.28em;
+  color: var(--faint); margin-bottom: 7px;
+}
+main h3 {
+  font-family: "Songti SC", "STSong", "SimSun", "Noto Serif SC", Georgia, serif;
+  font-size: 1.06rem; font-weight: 700; margin: 2.1em 0 0.6em;
+  color: var(--ink);
+}
+main h3 .tagline {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+  color: var(--red); border: 1px solid color-mix(in srgb, var(--red) 35%, var(--rule));
+  border-radius: 3px; padding: 1px 7px; margin-right: 9px;
+  vertical-align: 2px;
+}
+main p { margin-bottom: 1.15em; text-align: justify; }
+main p strong { font-weight: 700; }
+main p em { font-style: normal; border-bottom: 1px solid var(--rule2); }
+main a { color: var(--red); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--red) 30%, transparent); }
+main a:hover { border-bottom-color: var(--red); }
+
+/* 引文块 */
+.pull {
+  margin: 2.4em 0; padding: 22px 0;
+  border-top: 1px solid var(--rule2); border-bottom: 1px solid var(--rule2);
+  font-size: 1.12rem; line-height: 1.9; color: var(--ink); text-align: center;
+}
+.pull cite {
+  display: block; margin-top: 12px;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.72rem; font-style: normal; letter-spacing: 0.12em; color: var(--faint);
+}
+
+/* 边注 */
+.aside {
+  margin: 1.6em 0 1.6em;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--rule2);
+  font-size: 0.88rem; line-height: 1.85; color: var(--muted);
+}
+.aside b { color: var(--ink); font-weight: 700; }
+
+/* 段落式编号动作 */
+.do { margin: 1.4em 0 1.8em; padding: 0; list-style: none; }
+.do li {
+  position: relative; padding-left: 34px; margin-bottom: 0.9em;
+  font-size: 0.96rem; line-height: 1.9; text-align: justify;
+}
+.do li::before {
+  content: counter(do);
+  counter-increment: do;
+  position: absolute; left: 0; top: 4px;
+  width: 22px; height: 22px; line-height: 22px; text-align: center;
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 40%, var(--rule));
+  border-radius: 50%;
+}
+.do { counter-reset: do; }
+.do li b { font-weight: 700; }
+
+/* ============ 分量表 ============ */
+.weights { margin: 2.4em 0 1em; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule2); }
+.weights table { width: 100%; border-collapse: collapse; font-size: 0.86rem; table-layout: fixed; }
+.weights thead th:nth-child(1), .weights tbody td:nth-child(1) { width: 76px; }
+.weights thead th:nth-child(2), .weights tbody td:nth-child(2) { width: 52px; }
+.weights thead th:nth-child(3), .weights tbody td:nth-child(3) { width: 46%; }
+.weights thead th, .weights tbody td { word-break: break-word; }
+.weights thead th {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.68rem; letter-spacing: 0.12em; color: var(--faint);
+  text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--rule);
+  font-weight: 500;
+}
+.weights td { padding: 10px 8px; border-bottom: 1px dotted var(--rule); vertical-align: top; line-height: 1.8; }
+.weights tr:last-child td { border-bottom: none; }
+.weights td.line {
+  font-family: "Songti SC", Georgia, serif; font-weight: 700; white-space: nowrap;
+}
+.weights td.role { white-space: nowrap; font-size: 0.76rem; }
+.weights .r-main { color: var(--red); font-weight: 700; }
+.weights .r-sub { color: var(--green); }
+.weights .r-off { color: var(--faint); }
+.weights .stop { color: var(--muted); font-size: 0.78rem; }
+.weights .cap {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.7rem; color: var(--faint); letter-spacing: 0.08em;
+  padding: 8px 6px 10px;
+}
+
+/* ============ 判据 ============ */
+.gate {
+  margin: 2.6em -8px; padding: 24px 26px;
+  background: var(--paper2); border: 1px solid var(--rule2); border-radius: 3px;
+}
+.gate .g-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; letter-spacing: 0.26em; color: var(--green); display: block;
+}
+.gate h3 { margin: 8px 0 4px; font-size: 1.08rem; }
+.gate .g-intro { font-size: 0.88rem; color: var(--muted); margin-bottom: 14px; }
+.gate ul { list-style: none; }
+.gate li {
+  position: relative; padding-left: 26px; margin-bottom: 0.55em;
+  font-size: 0.92rem; line-height: 1.8;
+}
+.gate li::before {
+  content: ""; position: absolute; left: 0; top: 11px;
+  width: 11px; height: 11px; border: 1.5px solid var(--green); border-radius: 2px;
+}
+.gate .g-foot {
+  margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--rule2);
+  font-size: 0.84rem; color: var(--muted);
+}
+
+/* ============ 死法 ============ */
+.death {
+  margin: 2.6em -8px; padding: 24px 26px;
+  background: #211E19; color: #EFE8DA; border-radius: 3px;
+}
+.death .d-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; letter-spacing: 0.26em; color: #E08A72; display: block;
+  margin-bottom: 10px;
+}
+.death h3 { color: #F6F0E2; margin: 0 0 14px; font-size: 1.06rem; }
+.death .d-item { margin-bottom: 1.1em; }
+.death .d-item:last-child { margin-bottom: 0; }
+.death .d-name { font-weight: 700; color: #F6F0E2; font-size: 0.95rem; }
+.death .d-body { font-size: 0.88rem; line-height: 1.85; color: #C9C0AE; margin-top: 2px; }
+.death .d-body b { color: #E9B7A5; font-weight: 500; }
+
+/* ============ 书单 ============ */
+.shelf { margin: 2.6em 0; }
+.shelf .s-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; letter-spacing: 0.26em; color: var(--red);
+  border-bottom: 2px solid var(--ink); padding-bottom: 8px; display: block;
+}
+.book {
+  display: grid; grid-template-columns: 4px 1fr; gap: 0 18px;
+  padding: 18px 0; border-bottom: 1px solid var(--rule);
+}
+.book .spine { background: var(--red); border-radius: 1px; }
+.book .spine.s2 { background: var(--green); }
+.book .b-main { font-size: 1.02rem; font-weight: 700; line-height: 1.5; }
+.book .b-meta {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.72rem; color: var(--faint); letter-spacing: 0.06em; margin-top: 3px;
+}
+.book .b-why { font-size: 0.9rem; color: var(--muted); margin-top: 8px; line-height: 1.8; }
+.book .b-why b { color: var(--ink); font-weight: 700; }
+.book .b-read {
+  margin-top: 8px; font-size: 0.84rem; color: var(--ink);
+  background: var(--paper2); padding: 8px 12px; border-radius: 2px; line-height: 1.75;
+}
+.book .b-read span { color: var(--red); font-weight: 700; }
+
+/* ============ 本章留下的债 ============ */
+.debt {
+  margin: 3em 0 2em; padding: 22px 24px;
+  border: 1px dashed var(--rule2); border-radius: 3px;
+}
+.debt .dt-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; letter-spacing: 0.26em; color: var(--faint);
+}
+.debt p { font-size: 0.95rem; color: var(--muted); margin: 8px 0 0; }
+.debt p b { color: var(--ink); }
+
+/* ============ 章末导航 ============ */
+.chfoot {
+  display: flex; gap: 12px; margin-top: 4em; padding-top: 22px;
+  border-top: 3px double var(--rule2);
+}
+.chfoot a {
+  flex: 1; text-decoration: none; border: 1px solid var(--rule);
+  border-radius: 3px; padding: 14px 16px; color: var(--ink);
+  transition: border-color .12s, background .12s;
+}
+.chfoot a:hover { border-color: var(--red); background: var(--paper2); }
+.chfoot .dir {
+  display: block;
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.64rem; letter-spacing: 0.2em; color: var(--faint); margin-bottom: 3px;
+}
+.chfoot .nm { font-size: 0.98rem; font-weight: 700; }
+.chfoot a.next { text-align: right; }
+.chfoot a.toc { flex: 0 0 auto; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+
+/* ============ 首页 / 封面 ============ */
+.cover { padding: 96px 0 60px; text-align: center; border-bottom: 3px double var(--rule2); }
+.cover .c-kicker {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.68rem; letter-spacing: 0.4em; color: var(--red); margin-bottom: 26px;
+}
+.cover h1 {
+  font-size: clamp(2.6rem, 9vw, 4.2rem); font-weight: 700; letter-spacing: 0.12em;
+  line-height: 1.25;
+}
+.cover .c-sub {
+  margin-top: 22px; font-size: 1.02rem; color: var(--muted); letter-spacing: 0.06em;
+}
+.cover .c-rule {
+  width: 60px; height: 1px; background: var(--rule2); margin: 30px auto;
+}
+.cover .c-meta {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.74rem; color: var(--faint); letter-spacing: 0.1em; line-height: 2;
+}
+
+/* 目录 */
+.toc-list { margin: 2em 0; }
+.toc-item {
+  display: grid; grid-template-columns: 52px 1fr; gap: 16px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule);
+  text-decoration: none; color: var(--ink);
+}
+.toc-item:hover .t-name { color: var(--red); }
+.toc-item .t-no {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.7rem; letter-spacing: 0.14em; color: var(--red); padding-top: 6px;
+}
+.toc-item .t-name { font-size: 1.28rem; font-weight: 700; line-height: 1.5; transition: color .12s; }
+.toc-item .t-station {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.72rem; color: var(--green); letter-spacing: 0.1em; margin-top: 2px;
+}
+.toc-item .t-line { font-size: 0.88rem; color: var(--muted); margin-top: 6px; line-height: 1.75; }
+.toc-item .t-lines {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.7rem; color: var(--faint); letter-spacing: 0.04em; margin-top: 7px;
+}
+
+/* 前言区块 */
+.note {
+  margin: 2em 0; padding: 20px 24px;
+  background: var(--paper2); border-radius: 3px;
+  font-size: 0.92rem; line-height: 1.9;
+}
+.note .n-label {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.64rem; letter-spacing: 0.24em; color: var(--red); display: block; margin-bottom: 8px;
+}
+
+/* 两个时间轴对照 */
+.clock { margin: 2.2em 0; border-top: 1px solid var(--rule2); border-bottom: 1px solid var(--rule2); }
+.clock .cl-row {
+  display: grid; grid-template-columns: 108px 1fr; gap: 14px;
+  padding: 14px 0; border-bottom: 1px dotted var(--rule);
+  font-size: 0.9rem; line-height: 1.8;
+}
+.clock .cl-row:last-child { border-bottom: none; }
+.clock .cl-name {
+  font-weight: 700; font-size: 0.9rem;
+}
+.clock .cl-name small {
+  display: block;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.66rem; font-weight: 400; color: var(--faint); letter-spacing: 0.08em;
+}
+.clock .cl-body { color: var(--muted); }
+.clock .cl-body b { color: var(--ink); }
+
+/* 七站一览 */
+.stations { margin: 2.4em 0; display: flex; flex-direction: column; gap: 0; }
+.st { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.st .st-n {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.78rem; color: var(--red); padding-top: 3px;
+}
+.st .st-t { font-weight: 700; }
+.st .st-d { font-size: 0.86rem; color: var(--muted); line-height: 1.75; }
+.st.pmf .st-t { color: var(--red); }
+
+/* 尾章：分量曲线（纯文本条形） */
+.bars { margin: 2.2em 0; }
+.bar-row { display: grid; grid-template-columns: 116px 1fr 46px; gap: 12px; align-items: center; padding: 8px 0; font-size: 0.85rem; }
+.bar-row .br-n { color: var(--ink); }
+.bars .br-cap {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.66rem; letter-spacing: 0.18em; color: var(--muted);
+  margin: 22px 0 6px; padding-bottom: 5px; border-bottom: 1px dotted var(--rule2);
+}
+.bars .br-cap:first-child { margin-top: 0; }
+.bar-row .br-track { height: 10px; background: var(--paper2); border-radius: 5px; overflow: hidden; }
+.bar-row .br-fill { height: 100%; background: var(--red); border-radius: 5px; }
+.bar-row .br-fill.g { background: var(--green); }
+.bar-row .br-v { font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace; font-size: 0.68rem; color: var(--faint); text-align: right; }
+
+/* ============ 响应式 ============ */
+@media (max-width: 640px) {
+  body { font-size: 16.5px; line-height: 1.95; }
+  .page { padding: 0 18px 70px; }
+  .chapter-head { padding: 52px 0 30px; }
+  .bookbar { padding: 8px 16px; }
+  .bb-nav a { width: 24px; height: 24px; line-height: 24px; font-size: 0.7rem; }
+  .weights { overflow-x: auto; }
+  .weights table { min-width: 480px; }
+  .weights td.stop { font-size: 0.74rem; }
+  .gate, .death { margin-left: 0; margin-right: 0; padding: 20px 18px; }
+  .toc-item { grid-template-columns: 40px 1fr; gap: 10px; }
+  .book { gap: 0 12px; }
+  .chfoot { flex-wrap: wrap; }
+}
+@media print {
+  .bookbar, .progress, .chfoot { display: none; }
+  body { font-size: 11pt; line-height: 1.7; background: #fff; }
+  .gate { background: #f6f4ee; border-color: #b9ae97; }
+  .death {
+    background: #fff; color: #1F1C17;
+    border: 1px solid #9A9080; border-left: 4px solid var(--red);
+  }
+  .death .d-label { color: var(--red); }
+  .death h3, .death .d-name { color: #1F1C17; }
+  .death .d-body { color: #3A362E; }
+  .death .d-body b { color: var(--red); font-weight: 700; }
+  .book .b-read { background: #f6f4ee; }
+  .gate, .shelf, .debt, .book { break-inside: avoid; }
+  .death .d-label, .death h3, .shelf .s-label { break-after: avoid; }
+  .death .d-item { break-inside: avoid; }
+  main h2 { break-after: avoid; }
+}
