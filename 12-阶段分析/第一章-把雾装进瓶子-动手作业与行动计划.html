@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一章 · 把雾装进瓶子 · 动手作业与行动计划（现状核对版）</title>
+<meta name="description" content="基于七次会议纪要逐格填写的第一章作业单：只写会议中提到的，没提到的留白标红。">
+<style>
+:root{
+  --paper:#FAF7F0; --paper2:#F2ECDE; --ink:#1F1C17; --muted:#6F675A; --faint:#9A9080;
+  --rule:#DCD3C0; --rule2:#C9BEA6; --red:#A83E2A; --green:#2C5C46; --blue:#2A3F5F;
+  --amber:#8A6420;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);
+  font-family:"Songti SC","STSong","SimSun","Noto Serif SC",Georgia,serif;
+  font-size:16.5px;line-height:1.95;-webkit-font-smoothing:antialiased}
+.sans{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.page{max-width:860px;margin:0 auto;padding:0 26px 100px}
+a{color:var(--red);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+a:hover{border-bottom-color:var(--red)}
+
+.doc-head{padding:64px 0 34px;border-bottom:3px double var(--rule2);margin-bottom:8px}
+.doc-kicker{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  font-size:.72rem;letter-spacing:.38em;color:var(--red);margin-bottom:18px}
+.doc-head h1{font-size:clamp(1.7rem,5vw,2.5rem);font-weight:700;line-height:1.4;letter-spacing:.03em}
+.doc-station{display:inline-block;margin-top:14px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:.78rem;letter-spacing:.16em;color:var(--green);
+  border:1px solid color-mix(in srgb,var(--green) 40%,var(--rule));border-radius:999px;padding:3px 14px}
+.doc-lead{margin-top:22px;font-size:1rem;color:var(--muted)}
+
+.rulebox{margin:30px 0;padding:18px 22px;background:var(--paper2);
+  border:1px solid var(--rule2);border-radius:6px;font-size:.9rem;line-height:1.9;color:var(--muted)}
+.rulebox b{color:var(--ink)}
+.rulebox .blank-demo{margin-left:4px}
+
+h2{font-size:1.32rem;font-weight:700;line-height:1.55;margin:2.7em 0 .8em;letter-spacing:.02em}
+h2 .secno{display:block;line-height:1.3;font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  font-size:.66rem;font-weight:400;letter-spacing:.28em;color:var(--faint);margin-bottom:7px}
+h3{font-size:1.02rem;font-weight:700;margin:1.9em 0 .55em}
+p{margin-bottom:1.1em;text-align:justify}
+p strong{font-weight:700}
+em{font-style:normal;border-bottom:1px solid var(--rule2)}
+
+.src{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.68rem;color:var(--blue);
+  background:color-mix(in srgb,var(--blue) 8%,transparent);border-radius:3px;padding:1px 6px;
+  margin-left:5px;white-space:nowrap;vertical-align:1px}
+.blank{display:inline-block;color:var(--red);font-weight:700;
+  border:1.5px dashed color-mix(in srgb,var(--red) 55%,transparent);border-radius:4px;
+  padding:0 10px;margin:0 2px;background:color-mix(in srgb,var(--red) 5%,transparent)}
+.chip{display:inline-block;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:.68rem;font-weight:600;letter-spacing:.08em;border-radius:999px;padding:1px 10px;vertical-align:2px;margin-left:8px}
+.c-have{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 45%,var(--rule))}
+.c-part{color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 50%,var(--rule))}
+.c-no{color:var(--red);border:1px solid color-mix(in srgb,var(--red) 45%,var(--rule))}
+
+table{width:100%;border-collapse:collapse;margin:1.2em 0 1.8em;font-size:.87rem;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75}
+th{font-weight:600;text-align:left;font-size:.74rem;letter-spacing:.06em;color:var(--muted)}
+th,td{border-bottom:1px solid var(--rule);padding:10px 10px;vertical-align:top}
+tr.tbreak td{border-top:2px solid var(--rule2);background:color-mix(in srgb,var(--paper2) 45%,transparent)}
+td .tdline{font-family:"Songti SC","STSong","SimSun",serif;font-size:.95rem;color:var(--ink)}
+td .tdsub{font-size:.76rem;color:var(--muted)}
+
+ul.do{margin:1.3em 0 1.7em;padding:0;list-style:none;counter-reset:do}
+ul.do li{position:relative;padding-left:34px;margin-bottom:.85em;font-size:.94rem;line-height:1.9;text-align:justify}
+ul.do li::before{content:counter(do);counter-increment:do;position:absolute;left:0;top:5px;
+  width:22px;height:22px;line-height:22px;text-align:center;
+  font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.72rem;color:var(--red);
+  border:1px solid color-mix(in srgb,var(--red) 40%,var(--rule));border-radius:50%}
+ul.do li b{font-weight:700}
+
+.aside{margin:1.5em 0;padding:2px 0 2px 16px;border-left:2px solid var(--rule2);
+  font-size:.88rem;line-height:1.85;color:var(--muted)}
+.aside b{color:var(--ink)}
+
+.statement{margin:1.4em 0 1.9em;padding:22px 26px;background:var(--paper2);border-radius:6px;
+  border:1px solid var(--rule2);font-size:1.04rem;line-height:2.1;text-align:justify}
+.statement .slot{color:var(--red);font-weight:700;border-bottom:1.5px dashed var(--red)}
+
+.gate{margin:2.6em 0;padding:28px 30px;border:2px solid var(--ink);border-radius:8px;background:var(--paper)}
+.g-label{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.7rem;
+  letter-spacing:.3em;color:var(--red)}
+.gate h3{margin:.7em 0 .5em;font-size:1.12rem}
+.g-intro{font-size:.88rem;color:var(--muted);margin-bottom:1em}
+.gate ul{list-style:none;padding:0}
+.gate li{padding:7px 0 7px 2px;border-bottom:1px dashed var(--rule);font-size:.9rem;line-height:1.8}
+.gate li:last-child{border-bottom:none}
+.gate .verdict{margin-top:14px;padding-top:14px;border-top:1px solid var(--rule2);
+  font-size:.9rem;font-weight:700;color:var(--red)}
+
+.death{margin:2.6em 0;padding:26px 30px;border:1.5px solid var(--red);border-radius:8px;
+  background:color-mix(in srgb,var(--red) 4%,var(--paper))}
+.d-label{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.7rem;letter-spacing:.3em;color:var(--red)}
+.death h3{margin:.7em 0 .6em;font-size:1.08rem;color:var(--red)}
+.d-item{margin-bottom:1.1em}
+.d-name{font-weight:700;font-size:.95rem;margin-bottom:2px}
+.d-body{font-size:.87rem;color:var(--muted);line-height:1.85}
+
+.debt{margin:2.6em 0;padding:26px 30px;border:1px solid var(--rule2);border-radius:8px;background:var(--paper2)}
+.dt-label{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.7rem;letter-spacing:.3em;color:var(--green)}
+.debt h3{margin:.7em 0 .6em;font-size:1.08rem}
+.debt p{font-size:.92rem;margin-bottom:.7em}
+
+.plan{margin:2.4em 0;padding:0;list-style:none;counter-reset:plan}
+.plan li{position:relative;padding:14px 16px 14px 56px;margin-bottom:12px;
+  border:1px solid var(--rule2);border-radius:6px;background:var(--paper2);
+  font-size:.93rem;line-height:1.9}
+.plan li::before{content:counter(plan);counter-increment:plan;position:absolute;left:15px;top:16px;
+  width:26px;height:26px;line-height:26px;text-align:center;
+  font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.78rem;font-weight:600;
+  color:var(--paper);background:var(--ink);border-radius:50%}
+.plan .p-t{font-weight:700}
+.plan .p-m{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.72rem;color:var(--red);margin-left:6px}
+.plan .p-o{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:.74rem;color:var(--green);margin-left:6px}
+.plan .p-out{display:block;margin-top:4px;font-size:.82rem;color:var(--muted)}
+.plan .p-out::before{content:"产出：";color:var(--red);font-weight:700}
+
+.foot{margin-top:60px;padding-top:20px;border-top:3px double var(--rule2);
+  font-size:.8rem;color:var(--faint);line-height:1.9}
+.foot b{color:var(--muted)}
+@media print{body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="doc-head">
+  <div class="doc-kicker">STAGE ANALYSIS · 第 壹 站 · 想 法 澄 清</div>
+  <h1>把雾装进瓶子：动手作业单（现状核对版）</h1>
+  <span class="doc-station">第一章动手部分 · 基于七次会议纪要逐格填写</span>
+  <p class="doc-lead">这一版只做一件事：把七次纪要里说过的，按第一章 1.9 的八项作业逐格填进去；纪要没说过的，一律留白标红。留白不是缺陷，留白就是假设。</p>
+</div>
+
+<div class="rulebox">
+  <b>填写规则（三条，都很硬）</b><br>
+  一、只写会议纪要中明确记载的内容，每处标注来源（<span class="mono">纪要①–⑦</span> 对应 <span class="mono">10-会议纪要/1.md–7.md</span>）；<br>
+  二、纪要未提及的判断，写 <span class="blank-demo blank">留白</span>，不编；<br>
+  三、人物按纪要原文：纪要①–③记作“邓淇”、纪要④–⑦记作“青禾”，从项目连续性看为同一核心创始人，本文统一写“青禾（邓淇）”。
+</div>
+
+<!-- ================= 现状速览 ================= -->
+<section>
+<h2><span class="secno">0 · 现状速览</span>我们此刻站在哪里</h2>
+<table>
+  <tr><th style="width:96px">项目</th><th>纪要中明确记载的现状</th></tr>
+  <tr><td class="tdline">产品</td><td class="tdline">AI 文书辅助平台：用户上传资料 / 源码，AI Agent 提取信息点，按模板生成论文、汇报类文本与 PPT；支持排版校验与审阅修改。已从“毕设论文工具”升级为插件化场景的通用平台（六层能力框架）<span class="src">纪要①②⑤⑥⑦</span></td></tr>
+  <tr><td class="tdline">定位红线</td><td class="tdline">“辅助工具”而非“代写工具”，成品责任由用户自担；内测期不收费<span class="src">纪要⑤</span></td></tr>
+  <tr><td class="tdline">双线工作流</td><td class="tdline">从零生成线 + 修改线（大改需传项目资料，小改只调格式语序）<span class="src">纪要⑥⑦</span></td></tr>
+  <tr><td class="tdline">进度</td><td class="tdline">纪要①时开发约 60%–70% → ②计划周末上线首版 → ③计划 15 号上线 → ⑦“产品功能已上线”、网站重构中、skill 分仓管理<span class="src">纪要①②③⑦</span></td></tr>
+  <tr><td class="tdline">团队分工</td><td class="tdline">青禾（邓淇）：前端 UI、Word 编排引擎、需求梳理；宁梓淇：AI 平台、skill 插件、后端接口；工网221江伊潭：用户视角对抗性审查；一谈：运营候选人；嘘声：数据分析、公私域研究<span class="src">纪要④⑤⑥②</span></td></tr>
+  <tr><td class="tdline">商业化</td><td class="tdline">收费模式目标为积分制（按 token 消耗、思考强度、执行时间折算），仅在研究阶段，暂不开发<span class="src">纪要⑤⑥</span></td></tr>
+  <tr><td class="tdline">自我察觉</td><td class="tdline">纪要⑦中宁梓淇已引用创业书籍观点指出：当前团队缺“先做需求验证再开发”环节，访谈结果应作为项目去留的“一票否决权”——这正是本作业单的由来<span class="src">纪要⑦</span></td></tr>
+</table>
+</section>
+
+<!-- ================= 作业一 ================= -->
+<section>
+<h2><span class="secno">作业一 · 30 分钟</span>生意陈述</h2>
+<p>句式来自第一章：“我们通过【渠道】为【人群】提供【价值】，并靠【收入方式】赚钱。”以下草案每一处红字都是一个待填的格，全部来自纪要原文：</p>
+<div class="statement">
+  我们通过<span class="slot">【校内熟人试点＋小红书自媒体展示】</span>为<span class="slot">【有毕设 / 汇报等文本需求、不愿花时间折腾格式的学生】</span>提供<span class="slot">【上传资料后自动信息编排、按模板生成成品并可审阅修改的一站式文书工作台】</span>，并靠<span class="slot">【积分制收费（内测期免费）】</span>赚钱。
+</div>
+<p>渠道依据：<span class="src">纪要②</span>（校内与老同学圈层试点、小红书自媒体展示）；人群依据：<span class="src">纪要②③</span>（不愿折腾文本格式的学生群体）；价值依据：<span class="src">纪要①⑤⑥⑦</span>；收入依据：<span class="src">纪要⑤⑥</span>。</p>
+<aside class="aside"><b>未写入的渠道：</b>GitHub 开源引流已被纪要②中嘘声与青禾（邓淇）共同否决（暴露操作逻辑、技术文档客户看不懂），故不进陈述。</aside>
+</section>
+
+<!-- ================= 作业二 ================= -->
+<section>
+<h2><span class="secno">作业二 · 60 分钟</span>九格画布（每格以“我认为”开头，右侧四格先填）</h2>
+<table>
+  <thead><tr><th style="width:88px">格</th><th>我认为……（纪要依据）</th><th style="width:150px">状态</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="tdline">客户细分</td><td class="tdline">我认为客户是有毕设、课设、比赛汇报等文本需求、不愿花时间折腾格式的学生群体<span class="src">纪要①②③</span>。<span class="tdsub">细分上团队存在分歧：嘘声主张主攻中低学历、避开会用 AI 的高学历者；青禾（邓淇）认为覆盖全体大学生<span class="src">纪要②</span>。后续按三类测试场景分层：大专（基础生成）/ 一本二本（辅助）/ 985·211（纯辅助微调）<span class="src">纪要⑤</span>。</span></td><td class="tdline">有初稿<span class="chip c-part">细分未定</span></td></tr>
+  <tr><td class="tdline">价值主张</td><td class="tdline">我认为价值是把“资料＋模板”直接变成“格式合规的成品”，替学生省掉学排版、反复改格式的过程；核心差异化是“直接可改”的闭环（生成＋审阅＋修改＋PPT）<span class="src">纪要①③⑥⑦</span>。口语化版本：减少无价值的重复整理<span class="src">纪要⑤</span>。</td><td class="tdline">有初稿<span class="chip c-have">共识较多</span></td></tr>
+  <tr><td class="tdline">渠道</td><td class="tdline">我认为初期靠自身院校与老同学等熟人圈层切入，再经小红书等自媒体展示功能引流<span class="src">纪要②</span>。</td><td class="tdline">有计划<span class="chip c-no">未验证</span></td></tr>
+  <tr><td class="tdline">客户关系</td><td class="tdline">我认为靠“辅助工具”定位＋免责声明＋AI 生成标识＋事实确认环节＋匿名 / 邮箱注册来建立信任；先内测免费试用、成熟后推广<span class="src">纪要④⑤⑦</span>。</td><td class="tdline">有设计<span class="chip c-no">未验证</span></td></tr>
+  <tr><td class="tdline">收入来源</td><td class="tdline">我认为靠积分制收费（按任务消耗 token、思考强度、执行时间折算），内测期不收费<span class="src">纪要⑤⑥</span>。具体价格与兑换比例：<span class="blank">留白</span></td><td class="tdline">半成<span class="chip c-no">价格未定</span></td></tr>
+  <tr class="tbreak"><td class="tdline">核心资源</td><td class="tdline">我认为核心资源是 AI Agent＋Skill 体系（六类文本技能、Word 编排引擎）、六层平台架构、四种 API 平台轮换调用与后台模型切换、前端由生成式 AI 工具统一制作<span class="src">纪要①④⑤⑥⑦</span></td><td class="tdline">有盘点<span class="chip c-have">已盘点</span></td></tr>
+  <tr><td class="tdline">关键业务</td><td class="tdline">我认为关键业务是：信息拆解、Word 编排、排版校验（多模态扫描格式信息表）、审阅修改、图表提取、PPT 生成、场景插件开发、三类测试场景模板<span class="src">纪要①⑤⑥⑦</span></td><td class="tdline">有清单<span class="chip c-have">已盘点</span></td></tr>
+  <tr><td class="tdline">重要合作</td><td class="tdline">我认为重要合作是：一谈（运营，候选）、嘘声（数据分析 / 公私域研究）、江伊潭（用户视角对抗性审查）；开源竞品仅做功能借鉴与 Skill 复用<span class="src">纪要②④⑤</span></td><td class="tdline">有雏形<span class="chip c-have">已有</span></td></tr>
+  <tr><td class="tdline">成本结构</td><td class="tdline">我认为主要成本是服务器采购与 AI 调用 token（双方已自费购买多账号补额度；项目前期成本极低）<span class="src">纪要①③⑦</span>。金额与结构：<span class="blank">留白</span></td><td class="tdline">半成<span class="chip c-no">数字未算</span></td></tr>
+  </tbody>
+</table>
+<aside class="aside"><b>认祖归宗（五种式样）：</b>纪要七次均未讨论本产品像哪一种商业模式式样——<span class="blank">留白</span>，作业日当天补（GATE 01 第 4 条要求能答出来）。</aside>
+</section>
+
+<!-- ================= 作业三 ================= -->
+<section>
+<h2><span class="secno">作业三 · 45 分钟</span>七问自测（A＝有数据或亲历事实 · B＝类比推理 · C＝纯猜测）</h2>
+<table>
+  <thead><tr><th style="width:70px">问题</th><th>我们的回答（纪要依据）</th><th style="width:64px">证据等级</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">1 工程</td><td class="tdline">有 Skill 化技术体系与“登录注册到交付”的全链路业务闭环；竞品只有底层引擎、缺乏完整业务体系<span class="src">纪要④⑤⑥</span>。<span class="tdsub">注意：竞品调研仅停留在读 README，未实际运行<span class="src">纪要④</span></span></td><td class="tdline">B<span class="chip c-part">类比</span></td></tr>
+  <tr><td class="tdline">2 时机</td><td class="tdline">七次纪要均无直接回答“为什么是现在”。最接近的只有一句现状描述：“当前 AI 排版存在不连贯、难以满足个性化格式需求的局限”<span class="src">纪要⑦</span>——不构成时机论证。<span class="blank">留白</span></td><td class="tdline">C<span class="chip c-no">死因候选</span></td></tr>
+  <tr><td class="tdline">3 垄断</td><td class="tdline">以毕设场景切入、先做小市场<span class="src">纪要⑤</span>；“追求省事的学生”覆盖九成主流市场<span class="src">纪要③</span>。<span class="tdsub">“比对手好十倍”从未论证。</span></td><td class="tdline">B / C</td></tr>
+  <tr><td class="tdline">4 团队</td><td class="tdline">分工明确且已实际运转：青禾（前端 / 引擎 / 需求）、宁梓淇（AI 平台 / Skill）、江伊潭（对抗审查）、一谈（运营候选）、嘘声（数据分析）<span class="src">纪要④⑤⑥②</span></td><td class="tdline">A<span class="chip c-have">事实</span></td></tr>
+  <tr><td class="tdline">5 分发</td><td class="tdline">校内＋小红书计划未执行；“100 人转化 10 人”的试点目标被嘘声判定预期过高<span class="src">纪要②</span>。分发现状＝0。</td><td class="tdline">C</td></tr>
+  <tr><td class="tdline">6 耐久</td><td class="tdline">无正面回答，且已有三条反证记录在案：大学生会用 AI 可直接覆盖需求<span class="src">纪要②</span>、被通用 AI 平替的风险<span class="src">纪要⑦</span>、用户习惯壁垒<span class="src">纪要⑦</span>。</td><td class="tdline">C<span class="chip c-no">死因候选</span></td></tr>
+  <tr><td class="tdline">7 秘密</td><td class="tdline">七次纪要均未明确回答“我们发现了什么别人没发现的”。最接近的表述（“竞品只做引擎、我们做全链路”）已归入第 1 问，不作重复计数。<span class="blank">留白</span></td><td class="tdline">C<span class="chip c-no">留白</span></td></tr>
+  </tbody>
+</table>
+<div class="death">
+  <span class="d-label">死因候选 · 圈 出 来</span>
+  <h3>C 最多的两问，未来复盘第一个回头看它</h3>
+  <div class="d-item">
+    <div class="d-name">一、时机之问（第 2 问）——“为什么是现在”</div>
+    <div class="d-body">纪要无答。按第一章的判词：时机问答不出 A 或 B，通常意味着在替一个旧机会补票。这是启动前提，必须先补。</div>
+  </div>
+  <div class="d-item">
+    <div class="d-name">二、耐久之问（第 6 问）——“通用 AI 平替”</div>
+    <div class="d-body">团队内部已有三人次提出（嘘声②、宁梓淇⑦），但目前只被当作“风险提及”，从未被当作“待验证的头号假设”去设计证伪实验。</div>
+  </div>
+</div>
+</section>
+
+<!-- ================= 作业四 ================= -->
+<section>
+<h2><span class="secno">作业四 · 30 分钟</span>三层任务（具体用户：普本院校、正在做毕设的学生<span class="src">纪要③</span>）</h2>
+<ul class="do">
+  <li><b>功能层。</b>“当我拿到项目源码和学校模板时，我想直接上传后得到一份格式合规的论文初稿，这样我就不用从零学 Word 排版。”<span class="src">纪要③</span>（上传源码即产出成品；不熟悉 Word / PS 的学生排版耗时极长、过程痛苦）</li>
+  <li><b>情感层。</b>“当导师把初稿打回让我改格式时，我不想再一版一版手动重排，这样我就不用陷在‘导师反馈—反复修改’的循环里。”<span class="src">纪要③⑤</span>（懒得反复打磨；不愿在与老师沟通中反复修改）</li>
+  <li><b>社会层。</b><span class="blank">留白</span> —— 七次纪要均未提及“用户希望别人怎么看他”。访谈时留意原话，编不出来就空着。</li>
+</ul>
+<p>痛点关键词原话（可直接用于文案）：<em>“懒得写、懒得学、懒得反复打磨”</em><span class="src">纪要③</span>。</p>
+</section>
+
+<!-- ================= 作业五 ================= -->
+<section>
+<h2><span class="secno">作业五 · 30 分钟</span>替代方案与人群出没地图</h2>
+<h3>替代方案（不是竞品，是“他现在怎么凑合”）</h3>
+<table>
+  <thead><tr><th style="width:150px">替代方案</th><th>纪要依据</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">手动修改者</td><td class="tdline">自己用 Word / PS 从头排版——耗时长、过程痛苦<span class="src">纪要③</span></td></tr>
+  <tr><td class="tdline">使用 AI 内置技能者</td><td class="tdline">直接和通用 AI 对话生成、再自己调格式——嘘声质疑“大学生懂用 AI 会直接覆盖该需求”<span class="src">纪要②⑦</span></td></tr>
+  <tr><td class="tdline">调用开源库者</td><td class="tdline">拿 GitHub 同类开源项目自己搭——此类项目大量存在<span class="src">纪要②⑦</span></td></tr>
+  <tr><td class="tdline">干脆不做</td><td class="tdline"><span class="blank">留白</span> 第一章提醒这是最强的对手（零成本、零风险、零学习曲线），但七次纪要从未讨论“用户为什么不能继续不做”。访谈必问。</td></tr>
+  </tbody>
+</table>
+<h3>人群出没地图（三类地方，纪提到过的只有这三处）</h3>
+<ul class="do">
+  <li>校内 / 老同学熟人圈层（自身院校试点）<span class="src">纪要②</span></li>
+  <li>小红书等自媒体平台<span class="src">纪要②</span></li>
+  <li>“常接触文本”的学生群体（如学生干部）——已作为访谈样本设计<span class="src">纪要⑦</span></li>
+</ul>
+<p>其余线下渠道（展会、社群、供应商名单等）纪要未提及，<span class="blank">留白</span>。</p>
+</section>
+
+<!-- ================= 作业六 ================= -->
+<section>
+<h2><span class="secno">作业六 · 20 分钟</span>痛值粗算与个人财务底线</h2>
+<h3>痛值（一个数量级即可，不精确到元）</h3>
+<p>公式：一次发生的频率 × 单次损失 × 涉及的人数。纪要中只有定性描述（“耗时极长”“精力耗费大”<span class="src">纪要③</span>），无任何数字——数字<span class="blank">留白</span>，待访谈问“上一次改格式花了多久、改了几版”后补。</p>
+<h3>个人财务底线（不领薪能撑几个月）</h3>
+<p>纪要只提到：项目前期成本极低<span class="src">纪要③</span>、服务器采购<span class="src">纪要①</span>、双方自费购买 token 账号<span class="src">纪要⑦</span>。“能撑的月数”从未讨论——<span class="blank">留白</span>。按第一章的判词：不知道这个数字的人，会在第五章被迫做最差的选择。</p>
+</section>
+
+<!-- ================= 作业七 ================= -->
+<section>
+<h2><span class="secno">作业七 · 45 分钟</span>可证伪的假设清单（第二章的作业单）</h2>
+<p>以下八条全部由纪要原文提炼，每条含人群、场景、代价，任一项不成立整句即被推翻。团队确认后保留不少于五条。</p>
+<table>
+  <thead><tr><th style="width:44px">#</th><th>可证伪句子</th><th style="width:96px">证伪方式</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">H1</td><td class="tdline">有毕设文本需求、不愿折腾格式的学生，会为“上传资料→按模板生成成品初稿”付费。<span class="src">纪要①②③⑦</span></td><td class="tdline">访谈＋第二章小额预售</td></tr>
+  <tr><td class="tdline">H2</td><td class="tdline">985 / 211 学生不需要本产品（会自己调教 AI），主力付费人群在大专与一本二本。<span class="src">纪要②⑤</span>（团队内部存在分歧，分歧本身就是待验证项）</td><td class="tdline">分层访谈对比付费意愿</td></tr>
+  <tr><td class="tdline">H3</td><td class="tdline">100 人的小范围试点可以转化 10 人。<span class="src">纪要②</span>（邓淇提出，嘘声判预期过高）</td><td class="tdline">第二章试点的实际转化数</td></tr>
+  <tr><td class="tdline">H4</td><td class="tdline">目标用户当前主要靠“通用 AI 对话＋手动调格式”凑合，而不是什么都不做。<span class="src">纪要②⑦</span></td><td class="tdline">访谈问过去行为（“上一次怎么做的”）</td></tr>
+  <tr><td class="tdline">H5</td><td class="tdline">竞品只有底层引擎、没有完整业务闭环，“插件化＋全链路”是我们可守的差异。<span class="src">纪要④⑤⑥</span>（当前只读过 README，未实际运行）</td><td class="tdline">实际运行竞品对照体验</td></tr>
+  <tr><td class="tdline">H6</td><td class="tdline">学生愿意把源码 / 毕设资料上传给一个小团队的云平台。<span class="src">纪要⑦</span>（隐私顾虑、自证困难的讨论已记录在案）</td><td class="tdline">内测真实上传率＋访谈顾虑原话</td></tr>
+  <tr><td class="tdline">H7</td><td class="tdline">按 token 折算的积分制收费，比按次 / 包月更能提升用户留存。<span class="src">纪要⑥</span>（青禾主张，宁梓淇曾提议按次数被驳回——未验证）</td><td class="tdline">第二章定价对比测试</td></tr>
+  <tr><td class="tdline">H8</td><td class="tdline">小红书的功能展示内容能带来目标客群注册试用。<span class="src">纪要②</span>（计划未执行）</td><td class="tdline">第二章小额内容测试</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ================= 作业八 ================= -->
+<section>
+<h2><span class="secno">作业八 · 60 分钟</span>找懂行的外部人讲一遍画布，只记皱眉</h2>
+<p>团队事实上已拥有三位外部视角，且皱眉已经发生。作业日只需把本画布向他们各讲一遍、补记新的皱眉格：</p>
+<table>
+  <thead><tr><th style="width:110px">外部人</th><th>已记录的皱眉（纪要原文提炼）</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">嘘声</td><td class="tdline">① 代写合规红线，须先备案否则封号下架；② 高学历学生会用 AI，建议避开；③ “100 人转化 10 人”预期过高；④ 开源前端会暴露操作逻辑；⑤ 闭源使用开源代码有协议侵权风险<span class="src">纪要②</span></td></tr>
+  <tr><td class="tdline">江伊潭</td><td class="tdline">① 不开放用户自有 API（内核暴露＋Key 保存违规）；② 免责声明、匿名登录、“录入前删除隐私”提示必须前置；③ 先做“上传、生成、导出、结束”四功能 MVP，别陷入边缘功能；④ 网页必须支持多屏多端登录<span class="src">纪要④⑤</span></td></tr>
+  <tr><td class="tdline">一谈</td><td class="tdline">待办已记录：以纯用户视角体验 Demo 并审查<span class="src">纪要⑤</span></td></tr>
+  </tbody>
+</table>
+<aside class="aside"><b>与第一章的差异说明：</b>书本要求“找一位懂行的外部人”，我们已有多位且在持续对抗——这是现状里少数跑在书前面的部分，保持住。</aside>
+</section>
+
+<!-- ================= 八条线现状 ================= -->
+<section>
+<h2><span class="secno">对照 1.3</span>八条线在这一章的分量与现状</h2>
+<table>
+  <thead><tr><th style="width:82px">线</th><th>本章要求做到哪里就停</th><th>现状（纪要依据）</th><th style="width:70px">达成</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">甲 战略<br><span class="tdsub">主线</span></td><td class="tdline">九格成文、七问有答、留白标红</td><td class="tdline">九格与七问从未做过；⑦宁梓淇已自我提醒“缺需求验证环节”</td><td class="tdline"><span class="chip c-no">未达</span></td></tr>
+  <tr><td class="tdline">乙 产品<br><span class="tdsub">主线</span></td><td class="tdline">三层任务各写一句，能对上访谈原话</td><td class="tdline">场景共识散落各纪要，功能层 / 情感层可拼出，社会层空白</td><td class="tdline"><span class="chip c-no">未达</span></td></tr>
+  <tr><td class="tdline">丁 销售<br><span class="tdsub">配角</span></td><td class="tdline">立三条访谈纪律，完成 5 场访谈</td><td class="tdline">⑦已定访谈计划（明日、周边同学、两类样本），但纪律未立、访谈 0 场</td><td class="tdline"><span class="chip c-no">未达</span></td></tr>
+  <tr><td class="tdline">丙 增长<br><span class="tdsub">配角</span></td><td class="tdline">三个替代方案与三类人出没的地方</td><td class="tdline">⑦的三类用户画像即是替代方案雏形；人群地图已有三处</td><td class="tdline"><span class="chip c-part">过半</span></td></tr>
+  <tr><td class="tdline">戊 定价<br><span class="tdsub">配角</span></td><td class="tdline">粗算痛值一个数量级</td><td class="tdline">积分制在研究中（⑥），但痛值从未算过、无任何数字</td><td class="tdline"><span class="chip c-no">未达</span></td></tr>
+  <tr><td class="tdline">己 财务<br><span class="tdsub">配角</span></td><td class="tdline">算出能撑的月数并写下</td><td class="tdline">从未讨论</td><td class="tdline"><span class="chip c-no">未达</span></td></tr>
+  <tr><td class="tdline">庚 组织<br><span class="tdsub">配角</span></td><td class="tdline">列三件事、一个画像，不急着找人</td><td class="tdline">事实缺口已现：运营（一谈候选②⑤）、营销公私域（嘘声②）、合规把关（江伊潭④⑤）——但未成文为缺口清单</td><td class="tdline"><span class="chip c-part">过半</span></td></tr>
+  <tr><td class="tdline">辛 法务<br><span class="tdsub">一个动作</span></td><td class="tdline">不注册、不平分、不发完整方案</td><td class="tdline">合规清单较全：ICP 备案、AI 生成标识、免责声明、软著、不承诺代写（⑤）；内测不收费、暂不注册经营主体（⑤），与本章纪律一致。留痕纪律未讨论</td><td class="tdline"><span class="chip c-have">基本达标</span></td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ================= 本章不做 · 偏差 ================= -->
+<section>
+<h2><span class="secno">对照 1.3 表尾</span>“本章不做”纪律 · 现状偏差核对</h2>
+<table>
+  <thead><tr><th style="width:130px">本章纪律</th><th>团队现状（纪要依据）</th><th style="width:70px">判定</th></tr></thead>
+  <tbody>
+  <tr><td class="tdline">不投放</td><td class="tdline">尚未投放；但宣传视频已制作（①）、小红书推广已计划（②）——已走到门口</td><td class="tdline"><span class="chip c-part">在门口</span></td></tr>
+  <tr><td class="tdline">不注册公司</td><td class="tdline">内测不收费、暂不注册经营主体<span class="src">纪要⑤</span></td><td class="tdline"><span class="chip c-have">一致</span></td></tr>
+  <tr><td class="tdline">不做产品原型</td><td class="tdline"><b>已在开发且功能已上线</b>：①时 60–70% → ⑦“产品功能已上线”。团队走的是第一章判为“赌博”的“先做出来看看”路线；⑦宁梓淇已自我察觉并主张访谈一票否决</td><td class="tdline"><span class="chip c-no">相反</span></td></tr>
+  <tr><td class="tdline">不谈融资</td><td class="tdline">七次纪要无融资讨论</td><td class="tdline"><span class="chip c-have">一致</span></td></tr>
+  </tbody>
+</table>
+<aside class="aside"><b>处置建议（写入行动计划的并行纪律）：</b>木已成舟的部分不推倒，但在 GATE 01 过站前，开发只做“维护已上线功能＋既定 UI 搭建”，不新增功能、不投放、不上大规模推广——把主力腾给验证。</aside>
+</section>
+
+<!-- ================= 行动计划 ================= -->
+<section>
+<h2><span class="secno">行动计划</span>严格按第一章 1.9 顺序执行，每项限时，超时就停</h2>
+<p>分工沿既定角色：青禾（邓淇）＝产品 / 需求侧主导，宁梓淇＝平台 / 数据侧主导，两人每晚 10 点进度对齐的机制不变<span class="src">纪要⑥</span>。</p>
+
+<h3>D0 · 一个工作日，两人同屏（线上即可），完成八项作业</h3>
+<ol class="plan">
+  <li><span class="p-t">确认生意陈述</span><span class="p-m">限时 30 分钟</span><span class="p-o">青禾＋宁梓淇</span>以本文作业一草案为底，逐个【】过一遍：说不出依据的格当场标红。<span class="p-out">一句成文的生意陈述，每个空都有主。</span></li>
+  <li><span class="p-t">九格画布定稿</span><span class="p-m">限时 60 分钟</span><span class="p-o">青禾＋宁梓淇</span>以本文作业二为底，右侧四格先核；只允许改写，不允许新编；改不出的格留白标红；顺手补“像五种式样中的哪一种”。<span class="p-out">九格 v1＋式样认祖归宗。</span></li>
+  <li><span class="p-t">七问对齐</span><span class="p-m">限时 45 分钟</span><span class="p-o">两人先各自独立标 A/B/C（10 分钟），再对齐（35 分钟）</span>圈出 C 最多的两问写成“死因候选”。<span class="p-out">七问定稿＋死因候选成文（当前候选：时机之问、通用 AI 平替）。</span></li>
+  <li><span class="p-t">三层任务</span><span class="p-m">限时 30 分钟</span><span class="p-o">青禾主导</span>核对本文作业四；社会层编不出来就留白，访谈时用原话补。<span class="p-out">三层各一句，功能层与情感层须能对上访谈原话。</span></li>
+  <li><span class="p-t">替代方案与人群地图</span><span class="p-m">限时 30 分钟</span><span class="p-o">宁梓淇主导</span>核对三类画像；为“干脆不做”这个最强对手准备一句应答话术（回答“为什么不能继续凑合”）。<span class="p-out">四行替代方案＋三处人群地点。</span></li>
+  <li><span class="p-t">个人财务底线</span><span class="p-m">限时 20 分钟</span><span class="p-o">各自写自己的，先不交换</span>写下“不领薪能撑几个月、最多能拿出多少钱做验证”；痛值数字留白待访谈。<span class="p-out">两个数字落在纸上（不公开、进第三章的输入）。</span></li>
+  <li><span class="p-t">假设清单确认</span><span class="p-m">限时 45 分钟</span><span class="p-o">青禾＋宁梓淇</span>对本文 H1–H8 逐条确认 / 删除 / 改写，成文不少于五条，每条必须含人群、场景、代价。<span class="p-out">第二章的作业单。</span></li>
+  <li><span class="p-t">外部人讲画布</span><span class="p-m">限时 60 分钟</span><span class="p-o">对嘘声、江伊潭各讲一遍，一谈到位再加一场</span>只记录在哪一格皱眉，不辩论不解释。<span class="p-out">皱眉清单，新皱眉优先排入验证。</span></li>
+</ol>
+
+<h3>D1–D7 · 本周，访谈与过站核对</h3>
+<ol class="plan" style="counter-reset:plan 8">
+  <li><span class="p-t">执行 5 场访谈</span><span class="p-o">按⑦已定的计划：周边同学，样本分“无文本接触经验”与“常接触文本”两类</span>开场前先立三条纪律（刻在桌上）：问过去不问未来、问生活不问点子、问细节不问评价；只记原话，不记结论。<span class="p-out">≥5 场访谈记录，全部为原话。</span></li>
+  <li><span class="p-t">GATE 01 过站核对</span><span class="p-m">周末</span><span class="p-o">青禾＋宁梓淇</span>对照下方判据逐条打勾；缺哪条，下周只补那一条。<span class="p-out">过站判定：进第二章，或继续补作业。</span></li>
+</ol>
+
+<h3>开发侧并行纪律（GATE 01 过站前一直有效）</h3>
+<ul class="do">
+  <li><b>只做两件事：</b>维护已上线功能、推进既定 UI 搭建<span class="src">纪要⑦既定方向</span>；不新增功能、不投放、不上大规模推广。</li>
+  <li><b>个人分支独立开发、跑通后大合并的机制不变</b><span class="src">纪要⑦</span>。</li>
+  <li><b>每晚 10 点进度对齐机制不变</b><span class="src">纪要⑥</span>；会议聚焦“未决事项＋已定事项的新变化”<span class="src">纪要⑥</span>。</li>
+</ul>
+</section>
+
+<!-- ================= GATE 01 ================= -->
+<section>
+<div class="gate">
+  <span class="g-label">GATE 01 · 过 站 判 据（现 状 打 分）</span>
+  <h3>什么算过了这一站</h3>
+  <p class="g-intro">五条同时成立才有资格进入第二章。以下是“此刻”的核对结果，周末按同一张表重打一次。</p>
+  <ul>
+    <li><b>① 画布九格成文，且没有一格整张照抄同行</b> —— 现状：未成文（本作业二为草案）<span class="chip c-no">未过</span></li>
+    <li><b>② 七问每问有答案并标 A/B/C，允许难看、不允许空白</b> —— 现状：时机、秘密两问空白<span class="chip c-no">未过</span></li>
+    <li><b>③ 假设清单≥5 条，每条可证伪、含人群场景代价</b> —— 现状：H1–H8 已列草案，待 D0 确认<span class="chip c-part">本周可过</span></li>
+    <li><b>④ 能说出模式像五种式样中的哪一种、差异在哪</b> —— 现状：从未讨论<span class="chip c-no">未过</span></li>
+    <li><b>⑤ 一句话说清从哪个细分市场起步、为什么是它</b> —— 现状：前半句有（毕设场景切入、追求省事的学生<span class="src">纪要③⑤</span>），“为什么是它”未论证<span class="chip c-part">半过</span></li>
+    <li><b>软判据：≥5 场访谈、每场记原话</b> —— 现状：0 场（⑦已定明日开始）<span class="chip c-no">未过</span></li>
+  </ul>
+  <p class="verdict">当前结论：未达过站判据。开发已跑到第三章门口，验证还停在第一章门口——本周补齐后再核对。</p>
+</div>
+</section>
+
+<!-- ================= DEBT ================= -->
+<section>
+<div class="debt">
+  <span class="dt-label">DEBT · 本 章 留 下 的 债</span>
+  <h3>作业完成后我们欠后面几章什么</h3>
+  <p><b>欠第二章的：</b>D0 第 7 项确认后的假设清单（≥5 条可证伪句子）。第二章拿真钱换答案——试点转化（H3）、小红书内容（H8）、积分定价（H7）都在其中。</p>
+  <p><b>欠第三章的：</b>痛值数量级（访谈补数）＋两人各自的财务底线月数（D0 第 6 项各自写下）。前者是价格上限，后者是资金路径选择题的答案。</p>
+  <p><b>欠第五章的：</b>死因候选——目前圈的是“为什么是现在（时机）”与“通用 AI 平替（耐久）”。届月复盘第一个回头看它。</p>
+</div>
+</section>
+
+<div class="foot">
+  <b>依据文件：</b>10-会议纪要 / 1.md – 7.md（七次会议）；11-学习阅读材料 / book / chapter-1.html（第一章原文，作业项、停止线、GATE 01、死法与债均照此核对）。<br>
+  <b>编制说明：</b>本作业单为草案，所有填写内容仅来自会议纪要明确记载处；纪要未提及处一律留白标红，未做任何推测性补写。需团队（青禾（邓淇）、宁梓淇）核对后生效；核对动作见行动计划 D0。
+</div>
+
+</div>
+</body>
+</html>

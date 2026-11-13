@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>访谈执行手册 · 下一步工作</title>
+<meta name="description" content="第一章丁线访谈的可执行手册：三条纪律、问题清单、注意事项与场次规划。">
+<style>
+:root{
+  --paper:#FAF7F0; --paper2:#F2ECDE; --ink:#1F1C17; --muted:#6F675A; --faint:#9A9080;
+  --rule:#DCD3C0; --rule2:#C9BEA6; --red:#A83E2A; --green:#2C5C46; --blue:#2A3F5F;
+  --amber:#8A6420;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);
+  font-family:"Songti SC","STSong","SimSun","Noto Serif SC",Georgia,serif;
+  font-size:16.5px;line-height:1.95;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+.page{max-width:880px;margin:0 auto;padding:0 26px 100px}
+a{color:var(--red);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--red) 30%,transparent)}
+
+.doc-head{padding:60px 0 32px;border-bottom:3px double var(--rule2);margin-bottom:8px}
+.doc-kicker{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  font-size:.72rem;letter-spacing:.38em;color:var(--red);margin-bottom:18px}
+.doc-head h1{font-size:clamp(1.6rem,5vw,2.3rem);font-weight:700;line-height:1.4;letter-spacing:.03em}
+.doc-station{display:inline-block;margin-top:14px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:.78rem;letter-spacing:.16em;color:var(--green);
+  border:1px solid color-mix(in srgb,var(--green) 40%,var(--rule));border-radius:999px;padding:3px 14px}
+.doc-lead{margin-top:20px;font-size:1rem;color:var(--muted)}
+
+.rulebox{margin:28px 0;padding:18px 22px;background:var(--paper2);
+  border:1px solid var(--rule2);border-radius:6px;font-size:.9rem;line-height:1.9;color:var(--muted)}
+.rulebox b{color:var(--ink)}
+
+h2{font-size:1.3rem;font-weight:700;line-height:1.55;margin:2.6em 0 .8em;letter-spacing:.02em}
+h2 .secno{display:block;line-height:1.3;font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  font-size:.66rem;font-weight:400;letter-spacing:.28em;color:var(--faint);margin-bottom:7px}
+h3{font-size:1rem;font-weight:700;margin:1.8em 0 .5em}
+p{margin-bottom:1.05em;text-align:justify}
+p strong{font-weight:700}
+em{font-style:normal;border-bottom:1px solid var(--rule2)}
+
+table{width:100%;border-collapse:collapse;margin:1.1em 0 1.7em;font-size:.86rem;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75}
+th{font-weight:600;text-align:left;font-size:.74rem;letter-spacing:.06em;color:var(--muted)}
+th,td{border-bottom:1px solid var(--rule);padding:10px 10px;vertical-align:top}
+tr.tbreak td{border-top:2px solid var(--rule2);background:color-mix(in srgb,var(--paper2) 45%,transparent)}
+td .tdline{font-family:"Songti SC","STSong","SimSun",serif;font-size:.95rem;color:var(--ink)}
+td .tdsub{font-size:.76rem;color:var(--muted)}
+td.num{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.8rem;color:var(--red);white-space:nowrap}
+
+.src{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.66rem;color:var(--blue);
+  background:color-mix(in srgb,var(--blue) 8%,transparent);border-radius:3px;padding:1px 6px;
+  margin-left:5px;white-space:nowrap;vertical-align:1px}
+.chip{display:inline-block;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:.66rem;font-weight:600;letter-spacing:.08em;border-radius:999px;padding:1px 10px;vertical-align:2px}
+.c-have{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 45%,var(--rule))}
+.c-no{color:var(--red);border:1px solid color-mix(in srgb,var(--red) 45%,var(--rule))}
+.c-part{color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 50%,var(--rule))}
+
+.blank{display:inline-block;color:var(--red);font-weight:700;
+  border:1.5px dashed color-mix(in srgb,var(--red) 55%,transparent);border-radius:4px;
+  padding:0 10px;margin:0 2px;background:color-mix(in srgb,var(--red) 5%,transparent)}
+
+.warn{margin:2.2em 0;padding:24px 28px;border:1.5px solid var(--red);border-radius:8px;
+  background:color-mix(in srgb,var(--red) 4%,var(--paper))}
+.warn .w-label{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.7rem;letter-spacing:.3em;color:var(--red)}
+.warn h3{margin:.7em 0 .5em;font-size:1.06rem;color:var(--red)}
+.warn p,.warn li{font-size:.88rem;color:var(--muted)}
+.warn ul{list-style:none;padding:0}
+.warn li{padding:5px 0;border-bottom:1px dashed var(--rule)}
+.warn li:last-child{border-bottom:none}
+.warn li b{color:var(--ink)}
+
+.aside{margin:1.4em 0;padding:2px 0 2px 16px;border-left:2px solid var(--rule2);
+  font-size:.88rem;line-height:1.85;color:var(--muted)}
+.aside b{color:var(--ink)}
+
+.toll{margin:2.2em 0;padding:24px 28px;border:2px solid var(--ink);border-radius:8px;background:var(--paper)}
+.toll .w-label{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:.7rem;letter-spacing:.3em;color:var(--green)}
+.toll h3{margin:.7em 0 .6em;font-size:1.06rem}
+.toll p{font-size:.9rem;margin-bottom:.6em}
+
+.foot{margin-top:56px;padding-top:20px;border-top:3px double var(--rule2);
+  font-size:.8rem;color:var(--faint);line-height:1.9}
+.foot b{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="doc-head">
+  <div class="doc-kicker">NEXT STEP · 第 壹 站 · 访 谈 执 行</div>
+  <h1>访谈执行手册</h1>
+  <span class="doc-station">下一步工作 · 配合《第一章动手作业与行动计划》D1–D7 使用</span>
+  <p class="doc-lead">本手册回答三个问题：访谈纪律是什么（表格一）、问什么（表格二）、怎么判过关（表格三与场次规划）。全部依据第一章 §1.5、死法四、GATE 01 软判据，问题清单对应我们已确认的假设 H1–H8。</p>
+</div>
+
+<div class="rulebox">
+  <b>使用方式（两条）</b><br>
+  一、访谈人须在出发前读完《妈妈测试》（全书，约两小时）——这是第一章书单对本环节的唯一指定读物；<br>
+  二、本手册与《第一章动手作业与行动计划》的 D1–D7 阶段配套：每场访谈结束后当天填入"场次规划表"的记录栏，原话按假设编号归档。
+</div>
+
+<!-- ================= 表一：纪律 ================= -->
+<section>
+<h2><span class="secno">表 一</span>三条纪律与全程禁语</h2>
+<p>出处：第一章 §1.5（丁线）与死法四“访谈变路演”。这三条要刻在桌上，违反任何一条，这场访谈的数据作废。</p>
+<table>
+  <thead><tr><th style="width:110px">纪律</th><th>规则</th><th style="width:46%">违反时的样子</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="tdline">问过去<br>不问未来</td><td class="tdline">“你会用吗”没有信息量——人预测自己的行为极不准。要问“上一次遇到这个问题是什么时候，当时怎么处理的”。</td><td class="tdline">问回来一排“会啊”“挺好的”，回来记一笔“验证通过”——其实你收集的是礼貌，不是事实。</td></tr>
+  <tr><td class="tdline">问生活<br>不问点子</td><td class="tdline">不展示方案、不解释想法、不说“如果有一个东西能……”。你一开口讲方案，对方就开始配合你，访谈立刻变成社交。</td><td class="tdline">你讲 PPT 他点头，你讲产品他叫好，做出来没人用。</td></tr>
+  <tr><td class="tdline">问细节<br>不问评价</td><td class="tdline">“这个重要吗”是评价，答案永远是“挺重要的”。“发生了几次”“耽误多久”“被谁说过”是细节，细节自带数字与情绪，无法客套。</td><td class="tdline">笔记本上写满“用户认为××很重要”，却写不出一个数字、一个日期、一句原话。</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th style="width:120px">类别</th><th>具体要求（硬线）</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="tdline">发言占比</td><td class="tdline"><b>访谈人的发言不超过全程三成</b>（死法四解药）。超过三成，说明你在讲，不在听。</td></tr>
+  <tr><td class="tdline">全程禁语</td><td class="tdline">不出现“如果有一个产品”；不出现“我们在做一个……”；不展示宣传视频；不放产品截图。产品相关的一切，留到访谈结束后的闲聊环节再说。</td></tr>
+  <tr><td class="tdline">记录方式</td><td class="tdline">只记<b>原话</b>，不记结论——结论是你的翻译，翻译会自动向你的假设靠拢；原话不会。日后写文案、写定价页、写销售话术，最好的素材就是这些原话。</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ================= 表二：问题清单 ================= -->
+<section>
+<h2><span class="secno">表 二</span>访谈问题清单（8 问 · 对应假设 H1–H8）</h2>
+<p>用法：不必逐题照念，按阶段推进；每个问题都标注了它在验证哪条假设、听到什么算数、听到什么算证伪。问题问出口时保持口语，别念稿。</p>
+
+<h3>阶段 A · 开场（问生活）</h3>
+<table>
+  <thead><tr><th style="width:36px">#</th><th>问题</th><th style="width:66px">验证</th><th style="width:40%">合格信号 / 证伪信号</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="num">Q1</td><td class="tdline">“讲讲你上一次赶毕设 / 汇报文档的经历，具体到某个下午你在干什么。”</td><td class="tdline mono">场景·情感层</td><td class="tdline">合格：出现“熬夜改格式”“被打回崩溃”类行为细节。<br>证伪：对方表示“没什么特别的，一次就过了”——追问一句导师环节，仍无细节就记下。</td></tr>
+  </tbody>
+</table>
+
+<h3>阶段 B · 问过去与替代方案（他在拿什么凑合）</h3>
+<table>
+  <thead><tr><th style="width:36px">#</th><th>问题</th><th style="width:66px">验证</th><th style="width:40%">合格信号 / 证伪信号</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="num">Q2</td><td class="tdline">“格式排版那部分你当时怎么处理的？自己弄的，还是找人帮忙？”</td><td class="tdline mono">H4·“不做”</td><td class="tdline">合格：说出具体替代手段（手动 / AI / 开源库 / 学长代劳）。<br>证伪“不做”：对方说“格式那块我就没怎么管，最后也没事”——即“干脆不做”这个最强对手成立的信号，销售话术需回答“为什么不能继续凑合”。</td></tr>
+  <tr><td class="num">Q3</td><td class="tdline">“用过 AI 弄吗（ChatGPT / 豆包 / DeepSeek 都算）？那次怎么弄的，后来为什么接着用 / 不用了？”</td><td class="tdline mono">H4·耐久</td><td class="tdline">合格：说出“AI 排版不连贯、格式还是要自己调”类原话——这正是我们的差异点。<br>证伪：对方用通用 AI 已完全解决问题且无不满 → <b>死因候选“通用 AI 平替”加重</b>。</td></tr>
+  </tbody>
+</table>
+
+<h3>阶段 C · 问细节与代价（痛值 + 付费意愿）</h3>
+<table>
+  <thead><tr><th style="width:36px">#</th><th>问题</th><th style="width:66px">验证</th><th style="width:40%">合格信号 / 证伪信号</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="num">Q4</td><td class="tdline">“改一版大概花多长时间？总共改了几版？”</td><td class="tdline mono">痛值</td><td class="tdline">合格：给出具体时长与次数——当场记下数字，用于痛值粗算（频率 × 单次损失 × 人数）。</td></tr>
+  <tr><td class="num">Q5</td><td class="tdline">“因为格式 / 排版被打回过几次？当时谁说的你？你什么感受？”</td><td class="tdline mono">H1·情感层</td><td class="tdline">合格：出现“怕显得不专业”“被导师当众说”类原话——情感层任务句直接可用。</td></tr>
+  <tr><td class="num">Q6</td><td class="tdline">“上一次你为这类事花过钱吗？花了多少？”</td><td class="tdline mono">H1·付费</td><td class="tdline">合格：说出既往花费（代做 / 模板 / 会员），这是真实的出价行为。<br><span class="tdsub">注意：只问过去的实际花费，不问“你愿意付多少”——那是问未来，禁。</span></td></tr>
+  </tbody>
+</table>
+
+<h3>阶段 D · 问细分与收尾</h3>
+<table>
+  <thead><tr><th style="width:36px">#</th><th>问题</th><th style="width:66px">验证</th><th style="width:40%">合格信号 / 证伪信号</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="num">Q7</td><td class="tdline">“你们班 / 实验室里其他人怎么弄的？有没有完全不用 AI 的？”</td><td class="tdline mono">H2</td><td class="tdline">合格：两类样本对比出分层差异（大专 / 一本二本 / 985·211 对 AI 的使用水平）——直接喂给三类测试场景的取舍。</td></tr>
+  <tr><td class="num">Q8</td><td class="tdline">“还有什么我没问到、但你觉得煎熬的部分吗？”</td><td class="tdline mono">社会层</td><td class="tdline">作用：九格里空白的社会层，经常在这句被挖出来——记录“怕在组里显得不行”“想让导师觉得我靠谱”类原话。</td></tr>
+  </tbody>
+</table>
+
+<aside class="aside"><b>H3、H6–H8 的说明：</b>“100 人转化 10 人”（H3）与小红书引流（H8）属第二章小额测试，访谈不测；积分定价（H7）访谈只采集 Q6 的既往花费作参照；“愿意上传源码给小团队”（H6）不直接问——在访谈结束、聊起我们在做的事时，观察对方听说“要上传资料”的第一反应即可，不算正式访谈数据。</aside>
+</section>
+
+<!-- ================= 表三：注意事项 ================= -->
+<section>
+<h2><span class="secno">表 三</span>注意事项与判断标准</h2>
+<table>
+  <thead><tr><th style="width:110px">事项</th><th>要求</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="tdline">样本规划</td><td class="tdline">按纪要⑦已定的两类分：<b>“无文本接触经验”</b> 与 <b>“常接触文本（学生干部等）”</b>。5 场里两类都要覆盖（如 3+2），正反对比才能避免单一视角盲区；访谈对象必须是有文本编写需求的目标受众，避免找错人产出无效数据<span class="src">纪要⑦</span>。</td></tr>
+  <tr><td class="tdline">执行时长</td><td class="tdline">每场 20–40 分钟为宜；超过 40 分钟对方开始疲惫，后半段数据质量下降。</td></tr>
+  <tr><td class="tdline">记录工具</td><td class="tdline">征得同意后录音；不同意则逐字记关键原话。<b>当天整理</b>，按假设编号（H1–H8）归档原话，不写“用户认为……”式的结论句。</td></tr>
+  <tr><td class="tdline">访谈后禁动作</td><td class="tdline">访谈结束后的闲聊可以介绍产品，但此时收集到的任何赞美（“挺好的”“我要用”）一律不记录、不采信——那是礼貌，不是数据。</td></tr>
+  <tr><td class="tdline">数量要求</td><td class="tdline">GATE 01 软判据：<b>至少 5 场，每场记原话</b>。数量是逼你出门的参考线，不是让你凑数——5 场全是“挺好”等于 0 场。</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <span class="w-label">判 断 标 准 · 什 么 算 采 集 到 事 实</span>
+  <h3>每场访谈结束时自查五问</h3>
+  <ul>
+    <li><b>有没有至少三个带数字的原话？</b>（时长、次数、金额——喂给痛值粗算）</li>
+    <li><b>有没有至少一段“周三下午”式的具体经历描述？</b>（喂给功能层 / 情感层任务句）</li>
+    <li><b>对方有没有说出一句你没想到的话？</b>（没有 = 你在引导，不在听）</li>
+    <li><b>你的发言有没有超过三成？</b>（超过 = 这场有路演嫌疑）</li>
+    <li><b>如果 5 场里没人提到“反复改格式 / 被打回”的行为细节——H1 亮红灯。</b>此时结论是“需求存疑”，而不是“产品需要更好”——先回画布，不进第二章。</li>
+  </ul>
+</div>
+</section>
+
+<!-- ================= 场次规划 ================= -->
+<section>
+<h2><span class="secno">表 四</span>场次规划与记录（执行中填写）</h2>
+<table>
+  <thead><tr><th style="width:56px">场次</th><th style="width:120px">样本类型</th><th style="width:110px">访谈对象</th><th style="width:96px">访谈人</th><th>日期与原话要点（按假设编号归档）</th></tr></thead>
+  <tbody>
+  <tr class="tbreak"><td class="num">1</td><td class="tdline"><span class="blank">待定</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td></tr>
+  <tr><td class="num">2</td><td class="tdline"><span class="blank">待定</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td></tr>
+  <tr><td class="num">3</td><td class="tdline"><span class="blank">待定</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td></tr>
+  <tr><td class="num">4</td><td class="tdline"><span class="blank">待定</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td></tr>
+  <tr><td class="num">5</td><td class="tdline"><span class="blank">待定</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td><td class="tdline"><span class="blank">留白</span></td></tr>
+  </tbody>
+</table>
+<p>建议两类样本按 3 + 2 分布（哪类取 3，由访谈人对身边资源更充足的一侧决定）；如 5 场后出现两类样本结论明显相反，追加 1–2 场做交叉验证再下结论。</p>
+</section>
+
+<div class="toll">
+  <span class="w-label">OUTPUT · 本 环 节 的 产 出</span>
+  <h3>访谈结束后应拿到的三样东西</h3>
+  <p><b>一、痛值粗算的数字底料</b>：每场至少三个数（时长、次数、金额），汇总出一个数量级——欠第三章的债在此还清一半。</p>
+  <p><b>二、三层任务的第二句</b>：情感层与社会层的任务句由访谈原话改写，替换作业四里的留白。</p>
+  <p><b>三、H1 的红绿灯判定</b>：绿（≥3 场出现付费行为或强痛原话）→ 按 GATE 01 核对后进第二章；红（无人提及行为细节）→ 回画布重估客户细分，不硬闯第二章。</p>
+</div>
+
+<div class="foot">
+  <b>依据文件：</b>11-学习阅读材料 / book / chapter-1.html（§1.5 三条纪律、死法四、GATE 01 软判据、书单《妈妈测试》）；10-会议纪要 / 7.md（访谈计划与两类样本）；12-阶段分析 /《第一章-把雾装进瓶子-动手作业与行动计划》（假设清单 H1–H8、D1–D7 排期）。<br>
+  <b>编制说明：</b>问题清单中 Q1–Q8 为按第一章纪律设计的提问草案（已删去客套式、可从其他问题答案中自然获得的冗余问），执行前可由访谈人转成自己的口语；纪律、禁语、判断标准均照第一章原文，未做推测性发挥。
+</div>
+
+</div>
+</body>
+</html>
