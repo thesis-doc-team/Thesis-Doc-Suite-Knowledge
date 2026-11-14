@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论文生成 Agent · 开发流程与选型指南</title>
+<style>
+  :root{
+    --bg:#f7f7f4; --card:#ffffff; --ink:#2c2c2a; --muted:#6f6d66; --line:#e4e2da;
+    --purple:#534AB7; --purple-bg:#EEEDFE; --purple-ink:#3C3489;
+    --blue:#185FA5; --blue-bg:#E6F1FB; --blue-ink:#0C447C;
+    --gray:#5F5E5A; --gray-bg:#F1EFE8; --gray-ink:#444441;
+    --teal:#0F6E56; --teal-bg:#E1F5EE; --teal-ink:#085041;
+    --coral:#993C1D; --coral-bg:#FAECE7; --coral-ink:#712B13;
+    --green:#3B6D11; --green-bg:#EAF3DE; --green-ink:#27500A;
+    --danger:#A32D2D; --danger-bg:#FCEBEB;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+
+  header{padding:56px 0 8px}
+  .kicker{font-size:13px;letter-spacing:.18em;color:var(--muted);margin-bottom:10px}
+  h1{font-size:30px;font-weight:600;line-height:1.3}
+  .sub{color:var(--muted);margin-top:12px;max-width:720px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(247,247,244,.96);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);margin-top:28px}
+  nav .wrap{display:flex;gap:4px;overflow-x:auto;padding:8px 24px;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav a{font-size:13px;color:var(--muted);padding:6px 10px;border-radius:999px;white-space:nowrap;flex:none}
+  nav a.on{background:var(--ink);color:#fff}
+  nav a:hover{background:#eae8e0}
+
+  section{padding:48px 0 8px}
+  h2{font-size:21px;font-weight:600;margin-bottom:6px}
+  .h2sub{color:var(--muted);margin-bottom:20px;max-width:760px}
+  h3{font-size:15px;font-weight:600}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+
+  .mind{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:18px}
+  .mind .m{border-radius:12px;padding:16px 18px;border:1px solid var(--line)}
+  .mind b{display:block;font-size:15px;margin-bottom:4px}
+  .mind span{font-size:13px;color:var(--muted);line-height:1.6;display:block}
+  .formula{font-family:Consolas,Menlo,monospace;font-size:14px;background:var(--gray-bg);
+    border:1px dashed var(--gray);border-radius:10px;padding:12px 16px;margin-top:16px;color:var(--gray-ink)}
+
+  .pipe{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding:18px 2px;margin-top:16px}
+  .pnode{flex:1;min-width:106px;border-radius:12px;padding:12px 12px;text-align:center;cursor:pointer;
+    border:1px solid;transition:transform .15s}
+  .pnode:hover{transform:translateY(-3px)}
+  .pnode .n{font-size:11px;letter-spacing:.1em;opacity:.75}
+  .pnode b{display:block;font-size:14px;margin:2px 0}
+  .pnode span{font-size:11px;line-height:1.45;display:block;opacity:.85}
+  .parrow{align-self:center;color:#b9b7ad;font-size:16px;flex:none}
+  .p-hint{font-size:12px;color:var(--muted);margin-top:10px}
+
+  .stephead{display:flex;align-items:flex-start;gap:16px;margin-top:56px;scroll-margin-top:70px}
+  .badge{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:600;color:#fff}
+  .stephead .t h2{margin-bottom:2px}
+  .stephead .t .why{color:var(--muted);font-size:14px;margin-top:4px}
+  .purpose{margin-top:14px}
+  .purpose b{color:var(--ink)}
+  .whyline{margin-top:8px;font-size:13.5px;color:var(--muted);background:var(--gray-bg);
+    border-radius:10px;padding:10px 14px}
+  .whyline::before{content:"为什么必须有 · ";font-weight:600;color:var(--gray-ink)}
+
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+  .opt{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px 14px;cursor:pointer;transition:border-color .15s, box-shadow .15s}
+  .opt:hover{border-color:#c9c7bd}
+  .opt .tag{position:absolute;top:-10px;left:14px;font-size:12px;font-weight:600;color:#fff;
+    padding:1px 10px;border-radius:999px}
+  .opt h3{margin-top:2px}
+  .opt p{font-size:13.5px;margin-top:6px}
+  .opt .meta{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;font-size:12.5px}
+  .opt .meta div{display:flex;gap:8px;margin-top:3px}
+  .opt .meta i{font-style:normal;font-weight:600;color:var(--muted);flex:none}
+  .opt .selected-mark{display:none;position:absolute;top:12px;right:14px;font-size:12px;font-weight:600;
+    color:var(--teal);background:var(--teal-bg);border-radius:999px;padding:1px 10px}
+  .opt.selected{border-width:1.5px;box-shadow:0 3px 14px rgba(44,44,42,.08)}
+  .opt.selected .selected-mark{display:block}
+  .opt.nope{opacity:.75}
+  .opt.nope:hover{border-color:var(--danger)}
+
+  .path-note{margin-top:14px;font-size:13.5px;background:var(--teal-bg);color:var(--teal-ink);
+    border-radius:10px;padding:10px 14px}
+  .path-note::before{content:"业内常见路径 · ";font-weight:600}
+
+  .cross{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px}
+  .cross .c{padding:18px 20px}
+  .cross .lvl{display:flex;gap:8px;margin-top:10px}
+  .cross .lvl span{font-size:12px;border:1px solid var(--line);border-radius:8px;padding:3px 10px;color:var(--muted);flex:1;text-align:center}
+  .cross .lvl span.hot{border-color:var(--coral);color:var(--coral-ink);background:var(--coral-bg)}
+
+  .decide{margin-top:16px}
+  .drow{display:flex;gap:14px;align-items:flex-start;padding:14px 4px;border-bottom:1px dashed var(--line)}
+  .drow input{margin-top:4px;accent-color:var(--purple);width:16px;height:16px;flex:none}
+  .drow .q b{font-size:14.5px}
+  .drow .q p{font-size:13px;color:var(--muted);margin-top:2px}
+
+  table.gloss{width:100%;border-collapse:collapse;margin-top:16px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px}
+  table.gloss th{background:var(--gray-bg);text-align:left;padding:10px 16px;font-size:13px;color:var(--gray-ink)}
+  table.gloss td{padding:10px 16px;border-top:1px solid var(--line);vertical-align:top}
+  table.gloss td:first-child{font-weight:600;white-space:nowrap}
+  table.gloss td:nth-child(2){color:var(--muted)}
+
+  footer{padding:40px 0 120px;color:var(--muted);font-size:13px}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(28,28,26,.97);color:#f4f3ef;
+    backdrop-filter:blur(6px)}
+  .bar .wrap{display:flex;align-items:center;gap:14px;padding:12px 24px}
+  .bar .sum{flex:1;font-size:13px;line-height:1.6;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+  .bar .sum::-webkit-scrollbar{display:none}
+  .bar .sum b{color:#fff}
+  .bar .sum i{font-style:normal;opacity:.55;margin:0 5px}
+  .bar button{flex:none;font-size:13px;font-weight:600;border:none;border-radius:999px;padding:8px 18px;
+    cursor:pointer;background:var(--teal-bg);color:var(--teal-ink)}
+  .bar button:hover{background:#9FE1CB}
+  .bar .tip{flex:none;font-size:11px;opacity:.6;max-width:180px;line-height:1.4;white-space:normal}
+
+  @media (max-width:640px){
+    h1{font-size:24px}
+    .bar .tip{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="kicker">技术路线 · 决策支持文档</div>
+  <h1>论文生成 Agent：开发流程与选型指南</h1>
+  <p class="sub">输入用户的项目源码 + 论文题目 + 格式要求，输出一篇符合真实项目和格式要求的论文。本文讲清楚：这个项目分几步、每步干嘛、每步有哪些做法可选。每一步你可以点选一个方案，页面底部实时汇总你的选型，复制后可直接用于团队对齐。</p>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#mind" data-spy="mind">心智模型</a>
+    <a href="#overview" data-spy="overview">流程总览</a>
+    <a href="#step1" data-spy="step1">① 摄取</a>
+    <a href="#step2" data-spy="step2">② 知识构建</a>
+    <a href="#step3" data-spy="step3">③ 格式规格化</a>
+    <a href="#step4" data-spy="step4">④ 规划</a>
+    <a href="#step5" data-spy="step5">⑤ 生成</a>
+    <a href="#step6" data-spy="step6">⑥ 校验</a>
+    <a href="#step7" data-spy="step7">⑦ 渲染</a>
+    <a href="#cross" data-spy="cross">贯穿三件事</a>
+    <a href="#decide" data-spy="decide">决策清单</a>
+    <a href="#gloss" data-spy="gloss">术语表</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<section id="mind">
+  <h2>先建立一个心智模型</h2>
+  <p class="h2sub">不搞懂这个，后面所有技术名词都是零散的。懂了它，每个步骤你都能看出"这在解决四件事里的哪一件"。</p>
+  <div class="formula">大模型 API = 一个远程函数 f(提示词) → 文本 &nbsp;·&nbsp; 无状态（每次调用互不记得）· 按字收费（token 计费）· 结果不确定（同输入可能不同输出）</div>
+  <p class="purpose" style="margin-top:14px">正因为它有这三个特性，<b>整个 agent 技术栈本质上只是在做四件事</b>：</p>
+  <div class="mind">
+    <div class="m" style="background:var(--purple-bg)"><b style="color:var(--purple-ink)">1 · 上下文工程</b><span>每次调用往提示词里塞什么材料。质量的上限由它决定。落到步骤 ①②④⑤</span></div>
+    <div class="m" style="background:var(--blue-bg)"><b style="color:var(--blue-ink)">2 · 输出约束</b><span>逼它稳定输出你要的结构，而不是一段靠碰运气解析的自由文本。落到步骤 ③⑤</span></div>
+    <div class="m" style="background:var(--coral-bg)"><b style="color:var(--coral-ink)">3 · 结果校验</b><span>怎么发现它这次有没有胡说。它的错误是"看起来对、实际错"。落到步骤 ⑥</span></div>
+    <div class="m" style="background:var(--teal-bg)"><b style="color:var(--teal-ink)">4 · 编排迭代</b><span>把单次调用串成流水线，并可持续改进。落到贯穿三件事</span></div>
+  </div>
+</section>
+
+<section id="overview">
+  <h2>流程总览：7 步</h2>
+  <p class="h2sub">点击任意节点跳到对应步骤。1、2 步决定"内容真不真"（这是产品的生死线），3、7 步决定"格式对不对"。</p>
+  <div class="pipe">
+    <a class="pnode" href="#step1" style="background:var(--purple-bg);border-color:var(--purple)"><span class="n">STEP 1</span><b style="color:var(--purple-ink)">仓库摄取</b><span style="color:var(--purple-ink)">接收·去噪·摸底</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step2" style="background:var(--purple-bg);border-color:var(--purple)"><span class="n">STEP 2</span><b style="color:var(--purple-ink)">知识构建</b><span style="color:var(--purple-ink)">代码 → 可引用材料</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step3" style="background:var(--blue-bg);border-color:var(--blue)"><span class="n">STEP 3</span><b style="color:var(--blue-ink)">格式规格化</b><span style="color:var(--blue-ink)">要求 → 机器规则</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step4" style="background:var(--gray-bg);border-color:var(--gray)"><span class="n">STEP 4</span><b style="color:var(--gray-ink)">规划</b><span style="color:var(--gray-ink)">大纲·材料分配</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step5" style="background:var(--teal-bg);border-color:var(--teal)"><span class="n">STEP 5</span><b style="color:var(--teal-ink)">生成</b><span style="color:var(--teal-ink)">带约束写初稿</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step6" style="background:var(--coral-bg);border-color:var(--coral)"><span class="n">STEP 6</span><b style="color:var(--coral-ink)">校验</b><span style="color:var(--coral-ink)">挑错·打回·缺料</span></a>
+    <div class="parrow">→</div>
+    <a class="pnode" href="#step7" style="background:var(--green-bg);border-color:var(--green)"><span class="n">STEP 7</span><b style="color:var(--green-ink)">渲染</b><span style="color:var(--green-ink)">确定性输出 Word</span></a>
+  </div>
+  <p class="p-hint">另有三件事不属于任何一步、但贯穿全程、决定项目成败：编排、可观测、评估。见<a href="#cross">贯穿三件事</a>。</p>
+</section>
+
+<div class="stephead" id="step1">
+  <div class="badge" style="background:var(--purple)">1</div>
+  <div class="t"><h2>仓库摄取</h2><div class="why">把用户上传的代码变成"干净、可分析"的输入</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>接收上传的仓库，扔掉干扰物（依赖包 node_modules、venv、构建产物、锁文件），摸清项目构成——什么语言、多大规模、有没有 README 和 git 历史。</p>
+  <div class="whyline">不做这步，垃圾内容会按字收费地稀释模型注意力——成本翻倍，质量反而下降。</div>
+  <div class="opts" data-step="1">
+    <div class="opt" data-name="规则清单去噪"><span class="tag" style="background:var(--purple)">A</span><span class="selected-mark">已选</span>
+      <h3>自维护规则清单</h3>
+      <p>自己写一份忽略目录/文件清单，按规则过滤。</p>
+      <div class="meta"><div><i>适合</i>起步阶段，白盒可控、好排查</div><div><i>工作量</i>小</div><div><i>坑</i>长尾目录名、中文路径、压缩包嵌套</div></div>
+    </div>
+    <div class="opt" data-name="现成打包工具"><span class="tag" style="background:var(--purple)">B</span><span class="selected-mark">已选</span>
+      <h3>用现成打包工具</h3>
+      <p>repomix / gitingest 等开源工具，自带去噪和合并输出。</p>
+      <div class="meta"><div><i>适合</i>零开发快速验证需求</div><div><i>工作量</i>极小</div><div><i>坑</i>黑盒、可控性弱，输出格式未必匹配你的后续管线</div></div>
+    </div>
+    <div class="opt" data-name="智能过滤"><span class="tag" style="background:var(--purple)">C</span><span class="selected-mark">已选</span>
+      <h3>语言自适应过滤</h3>
+      <p>识别项目语言和框架，精确排除无关物。</p>
+      <div class="meta"><div><i>适合</i>中后期，规则长尾积累多了再上</div><div><i>工作量</i>中</div><div><i>坑</i>本质是规则引擎，需要持续维护</div></div>
+    </div>
+  </div>
+  <div class="path-note">B 起步（一周内能跑通）→ 用户量起来后切 A/C 自建。安全红线：用户代码只做静态解析，<b>永不执行</b>。</div>
+</section>
+
+<div class="stephead" id="step2">
+  <div class="badge" style="background:var(--purple)">2</div>
+  <div class="t"><h2>知识构建 <span style="font-size:13px;color:var(--coral)">← 整个项目投入最重的一步</span></h2><div class="why">把"代码"变成模型写作时能引用的"材料"</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>产出一份关于这个项目的"材料库"。你在网上看到的 RAG、向量库、embedding，全是这一步的工具。写作质量的上限完全由这步决定——这也是各家同类产品拉开差距的地方。</p>
+  <div class="whyline">模型不认识你的用户。它写得出多"贴合真实项目"，取决于你喂了什么材料、喂得多准。</div>
+  <div class="opts" data-step="2">
+    <div class="opt" data-name="全量直塞"><span class="tag" style="background:var(--purple)">A</span><span class="selected-mark">已选</span>
+      <h3>全量直塞上下文</h3>
+      <p>去噪后整个仓库直接放进提示词。学生项目通常塞得下（几十万字符 ≈ 几万 token）。</p>
+      <div class="meta"><div><i>适合</i>MVP 首选，一周能做出来，检索质量不用操心</div><div><i>工作量</i>极小</div><div><i>坑</i>仓库超限则成本飙升；无逐条溯源粒度</div></div>
+    </div>
+    <div class="opt" data-name="向量检索RAG"><span class="tag" style="background:var(--purple)">B</span><span class="selected-mark">已选</span>
+      <h3>向量检索（经典 RAG）</h3>
+      <p>代码切块 → 向量化 → 存向量库 → 写作时按需检索相关片段。</p>
+      <div class="meta"><div><i>适合</i>仓库大到塞不下的场景</div><div><i>工作量</i>中</div><div><i>坑</i>代码切块比文本难（不能从函数中间切断），切块质量决定成败，检索不准全盘皆输</div></div>
+    </div>
+    <div class="opt" data-name="结构化蒸馏"><span class="tag" style="background:var(--purple)">C</span><span class="selected-mark">已选</span>
+      <h3>结构化蒸馏（效果天花板）</h3>
+      <p>先静态解析（语法树 AST、模块依赖、git 提交历史），再用便宜模型把材料提炼成一条条"事实卡片"入库，每条注明出自哪个文件。</p>
+      <div class="meta"><div><i>适合</i>追求"内容真、可审计"的核心路线</div><div><i>工作量</i>大</div><div><i>坑</i>管线最长；抽取器要按语言栈分别适配</div></div>
+    </div>
+  </div>
+  <div class="path-note">A 起步验证 → 渐进演进到 C（git 历史能挖出"遇到问题→改方案→指标提升"的叙事，这是论文最有价值、也最难伪造的原料）；B 视仓库大小决定要不要补。</div>
+</section>
+
+<div class="stephead" id="step3">
+  <div class="badge" style="background:var(--blue)">3</div>
+  <div class="t"><h2>格式规格化</h2><div class="why">把"格式要求"变成机器可校验的规则对象</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>产出一份 FormatSpec——标题分几级、图表怎么编号、参考文献什么格式……后续渲染照它执行、校验照它检查。</p>
+  <div class="whyline">格式如果每次让模型"现场发挥"，永远不稳定；规则化之后才能用脚本 100% 检查，而不是靠人眼。</div>
+  <div class="opts" data-step="3">
+    <div class="opt" data-name="用户填表单"><span class="tag" style="background:var(--blue)">A</span><span class="selected-mark">已选</span>
+      <h3>用户填结构化表单</h3>
+      <p>让用户按表单勾选/填写格式规则。</p>
+      <div class="meta"><div><i>适合</i>积累规则库的种子阶段</div><div><i>工作量</i>小</div><div><i>坑</i>用户嫌麻烦、覆盖不全，容易流失</div></div>
+    </div>
+    <div class="opt" data-name="解析Word样本"><span class="tag" style="background:var(--blue)">B</span><span class="selected-mark">已选</span>
+      <h3>解析 Word 样本</h3>
+      <p>docx 本质是 zip + XML，用现成库读样式定义和真实文档结构，自动抽出规则。</p>
+      <div class="meta"><div><i>适合</i>主路线——用户上传学校模板即可</div><div><i>工作量</i>中</div><div><i>坑</i>学校模板很脏，规则长尾多，需要容错</div></div>
+    </div>
+    <div class="opt" data-name="LLM翻译描述"><span class="tag" style="background:var(--blue)">C</span><span class="selected-mark">已选</span>
+      <h3>LLM 翻译自然语言</h3>
+      <p>用户写一段"我们学校要求……"，模型翻译成规则对象。</p>
+      <div class="meta"><div><i>适合</i>兜底，覆盖前两者搞不定的场景</div><div><i>工作量</i>小</div><div><i>坑</i>模型幻觉会混进规则库，必须加校验层</div></div>
+    </div>
+  </div>
+  <div class="path-note">B 为主、C 兜底；高频规范（如 GB/T 7714 参考文献格式）内置成确定性规则库，三种方式都不用碰它。</div>
+</section>
+
+<div class="stephead" id="step4">
+  <div class="badge" style="background:var(--gray)">4</div>
+  <div class="t"><h2>规划</h2><div class="why">拆大纲成任务树：几章、每章写什么、调用哪些材料</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>先生成章节树（结合论文题目 + 材料库 + FormatSpec 的结构要求），再给每个叶子节点分配：写作目标、所需材料子集、目标字数。</p>
+  <div class="whyline">一口气生成全文，模型必然"写到后面忘了前面"。规划是把长文拆成模型能力范围内的独立调用。</div>
+  <div class="opts" data-step="4">
+    <div class="opt" data-name="一次生成全文"><span class="tag" style="background:var(--gray)">A</span><span class="selected-mark">已选</span>
+      <h3>一次生成全文</h3>
+      <p>单次调用直接产出整篇。</p>
+      <div class="meta"><div><i>适合</i>只适合短文 / 单章</div><div><i>工作量</i>极小</div><div><i>坑</i>长论文必然前后失忆、术语漂移</div></div>
+    </div>
+    <div class="opt" data-name="先大纲后逐章"><span class="tag" style="background:var(--gray)">B</span><span class="selected-mark">已选</span>
+      <h3>先大纲、后逐章（map-reduce）</h3>
+      <p>两阶段：第一次调用产出大纲；然后逐章独立调用，每章带自己的上下文 + 全局术语表。</p>
+      <div class="meta"><div><i>适合</i>长文的标准解，业内主流</div><div><i>工作量</i>中</div><div><i>坑</i>需要额外维护"全局一致性"（见贯穿事项）</div></div>
+    </div>
+    <div class="opt" data-name="多agent协作"><span class="tag" style="background:var(--gray)">C</span><span class="selected-mark">已选</span>
+      <h3>多 agent 协作</h3>
+      <p>规划师、作者、编辑等多个角色 agent 反复磋商。</p>
+      <div class="meta"><div><i>适合</i>追求上限的中后期</div><div><i>工作量</i>大</div><div><i>坑</i>复杂度高、成本高、难调试，MVP 明确不需要</div></div>
+    </div>
+  </div>
+  <div class="path-note">B 是默认答案。全局一致性别指望模型记住——用数据库表（术语表/符号表/数字表）解决，每章生成时注入、校验时核对。</div>
+</section>
+
+<div class="stephead" id="step5">
+  <div class="badge" style="background:var(--teal)">5</div>
+  <div class="t"><h2>生成</h2><div class="why">带约束地写初稿。这一步内部有 3 个独立决策点</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>逐章产出初稿。三个子决策：<b>①上下文组装</b>（给什么材料——大纲节点 + 该章材料 + 全局术语表，这是质量核心，比提示词措辞重要得多）；<b>②输出约束</b>（怎么拿回结构化结果）；<b>③模型分工</b>（贵的写正文、便宜的干杂活，成本差一个量级）。</p>
+  <div class="opts" data-step="5">
+    <div class="opt" data-name="自由文本输出"><span class="tag" style="background:var(--teal)">A</span><span class="selected-mark">已选</span>
+      <h3>自由文本输出</h3>
+      <p>模型返回一段文章，程序自己解析。</p>
+      <div class="meta"><div><i>适合</i>原型验证</div><div><i>坑</i>结构解析靠碰运气，脏数据直接进下游</div></div>
+    </div>
+    <div class="opt" data-name="JSON结构化输出"><span class="tag" style="background:var(--teal)">B</span><span class="selected-mark">已选</span>
+      <h3>JSON 结构化输出</h3>
+      <p>用各家 API 的 schema 模式强制输出 JSON，字段、类型、枚举全部约束死。</p>
+      <div class="meta"><div><i>适合</i>主流做法，下游处理稳定可靠</div><div><i>坑</i>超长正文塞 JSON 里偶发截断，要按章拆分</div></div>
+    </div>
+    <div class="opt" data-name="约定标记+结构化"><span class="tag" style="background:var(--teal)">C</span><span class="selected-mark">已选</span>
+      <h3>结构化 + 内嵌引用标记</h3>
+      <p>在 B 的基础上，要求事实性句子自带材料引用编号，终稿剥离标记、留档备查。</p>
+      <div class="meta"><div><i>适合</i>"内容真"的核心保障，与第⑥步联动</div><div><i>坑</i>模型偶尔忘标或标错，需要校验兜底</div></div>
+    </div>
+  </div>
+  <div class="path-note">模型分工是另一个必答题：旗舰模型写正文，便宜模型承担蒸馏和校验等 token 大头环节——这是控制单篇成本的关键杠杆。</div>
+</section>
+
+<div class="stephead" id="step6">
+  <div class="badge" style="background:var(--coral)">6</div>
+  <div class="t"><h2>校验</h2><div class="why">生成 ≠ 可交付。挑错、分流：能修的打回重写，材料缺的进待补清单</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>分可靠性地查三类问题——格式合规、事实有据、前后一致。这三类分别用不同手段查，<b>能用脚本查的绝不劳烦模型</b>。</p>
+  <div class="opts" data-step="6">
+    <div class="opt" data-name="确定性脚本"><span class="tag" style="background:var(--coral)">A</span><span class="selected-mark">已选</span>
+      <h3>确定性脚本（可靠性 100%）</h3>
+      <p>格式规则、编号、引用格式、数字跨章一致——渲染后重新解析逐项比对，纯代码零模型。</p>
+      <div class="meta"><div><i>适合</i>一切能写规则的检查</div><div><i>坑</i>规则覆盖有长尾，需要持续积累</div></div>
+    </div>
+    <div class="opt" data-name="LLM-as-judge"><span class="tag" style="background:var(--coral)">B</span><span class="selected-mark">已选</span>
+      <h3>LLM-as-judge（语义评审）</h3>
+      <p>拿另一个模型按检查清单逐条评审："这句话有没有材料依据"。</p>
+      <div class="meta"><div><i>适合</i>脚本报不了"内容真假"的语义检查</div><div><i>坑</i>有误报——宁可错杀打回重写，也不放过编造</div></div>
+    </div>
+    <div class="opt" data-name="人工抽检"><span class="tag" style="background:var(--coral)">C</span><span class="selected-mark">已选</span>
+      <h3>人工抽检</h3>
+      <p>上线初期人工看一批产出，标注问题反哺规则库和检查清单。</p>
+      <div class="meta"><div><i>适合</i>冷启动阶段必做，顺便积累评估集</div><div><i>坑</i>不可规模化，定位是过渡手段</div></div>
+    </div>
+  </div>
+  <div class="path-note">A + B 组合是常态，C 在冷启动期并行。回改循环要设最大轮数（如 3 轮），防止"打回→重写→又不过"死循环烧 token。</div>
+</section>
+
+<div class="stephead" id="step7">
+  <div class="badge" style="background:var(--green)">7</div>
+  <div class="t"><h2>渲染</h2><div class="why">结构化内容 → 最终 Word，确定性执行</div></div>
+</div>
+<section>
+  <p class="purpose"><b>干嘛的：</b>按 FormatSpec 把结构化内容填进 Word 模板。这一步的目标是"零模型参与排版"。</p>
+  <div class="opts" data-step="7">
+    <div class="opt nope" data-name="LLM直接排版"><span class="tag" style="background:var(--danger)">✗</span><span class="selected-mark">已选</span>
+      <h3>让 LLM 直接吐格式</h3>
+      <p>让模型连排版一起生成。</p>
+      <div class="meta"><div><i>坑</i>不可行——排版必乱，返工无底洞。列在这里是防止团队踩坑</div></div>
+    </div>
+    <div class="opt" data-name="模板引擎docxtpl"><span class="tag" style="background:var(--green)">A</span><span class="selected-mark">已选</span>
+      <h3>模板引擎（docxtpl）</h3>
+      <p>学校样本改造成模板（Word 版的"填空模板"），程序往里填内容，样式天然继承学校要求。</p>
+      <div class="meta"><div><i>适合</i>主流做法</div><div><i>工作量</i>中</div><div><i>坑</i>模板本身要按学校积累，前期限 1-2 个学校做深</div></div>
+    </div>
+    <div class="opt" data-name="直接操作docxXML"><span class="tag" style="background:var(--green)">B</span><span class="selected-mark">已选</span>
+      <h3>直接操作 docx XML</h3>
+      <p>程序级完全控制 Word 文档对象。</p>
+      <div class="meta"><div><i>适合</i>疑难格式（如公式 OMML）才需要</div><div><i>坑</i>工作量大、细节地狱，非必要不上</div></div>
+    </div>
+  </div>
+  <div class="path-note">A 为主，遇到模板引擎搞不定的个别格式再局部用 B。图表（架构图、数据图）由程序自动生成后作为图片插入，同样不让模型画。</div>
+</section>
+
+<section id="cross">
+  <h2>贯穿全程的三件事</h2>
+  <p class="h2sub">不属于哪一步，但从第一天就要立项。它们决定项目能不能持续迭代，而不是"能跑一次的 demo"。</p>
+  <div class="cross">
+    <div class="card c" style="background:var(--gray-bg);border-color:var(--gray)">
+      <h3 style="color:var(--gray-ink)">编排：把步骤串起来跑</h3>
+      <p style="font-size:13.5px;margin-top:6px;color:var(--gray-ink)">生成是分钟级长任务，必须异步化。</p>
+      <div class="lvl"><span>线性脚本<br>MVP 够用</span><span class="hot">状态机+队列<br>生产必需</span><span>agent 框架<br>可选，非必需</span></div>
+      <p style="font-size:12.5px;margin-top:10px;color:var(--muted)">LangGraph 这类框架把循环抽象成图，省原型时间，但调试成本高。它不在关键路径上——你的核心壁垒不在框架里。</p>
+    </div>
+    <div class="card c" style="background:var(--coral-bg);border-color:var(--coral)">
+      <h3 style="color:var(--coral-ink)">可观测：LLM 应用的日志</h3>
+      <p style="font-size:13.5px;margin-top:6px;color:var(--coral-ink)">每次模型调用记录：输入、输出、花费、耗时、版本。</p>
+      <div class="lvl"><span>自建日志表<br>起步够用</span><span class="hot">Langfuse 等<br>开箱即用</span><span>全链路追踪<br>规模化需要</span></div>
+      <p style="font-size:12.5px;margin-top:10px;color:var(--muted)">比传统日志重要得多——因为 LLM 的错误是"看起来对、实际错"，没有调用记录你连错在哪一步都不知道。</p>
+    </div>
+    <div class="card c" style="background:var(--teal-bg);border-color:var(--teal)">
+      <h3 style="color:var(--teal-ink)">评估：LLM 应用的单元测试</h3>
+      <p style="font-size:13.5px;margin-top:6px;color:var(--teal-ink)">攒一批"真实仓库 → 真实论文"配对当回归测试集。</p>
+      <div class="lvl"><span>10 对起步</span><span class="hot">改动必跑回归</span><span>指标量化对比</span></div>
+      <p style="font-size:12.5px;margin-top:10px;color:var(--muted)">改一版提示词可能弄坏另外五章。没有评估集，每次改动都是盲改——这是业内公认最难、也最被忽视的一件事，<b>第一天就该开始攒</b>。</p>
+    </div>
+  </div>
+</section>
+
+<section id="decide">
+  <h2>决策清单：开工前要拍板的问题</h2>
+  <p class="h2sub">这些变量只有你们知道，它们会改变上面每一步的选型。逐项过一遍，勾掉即记录（本地保存）。</p>
+  <div class="card decide">
+    <label class="drow"><input type="checkbox" data-deck><div class="q"><b>1 · 目标用户的仓库长什么样？</b><p>语言栈分布（先支持哪 1-2 种）、典型大小、有无 git 历史、能不能跑起来。直接决定第②步选 A/B/C 的哪一档。</p></div></label>
+    <label class="drow"><input type="checkbox" data-deck><div class="q"><b>2 · 团队技术栈偏 Python 还是别的？</b><p>这套生态（代码解析、docx、LLM SDK）在 Python 最全。若团队是 Java/Go 系，要评估"硬上 Python"还是"服务拆开、只把 AI 部分交给 Python"。</p></div></label>
+    <label class="drow"><input type="checkbox" data-deck><div class="q"><b>3 · 先做哪几所学校 / 哪类专业？</b><p>格式长尾无法一次覆盖。MVP 期限定 1-2 个学校做深，直接决定第③⑦步的模板和规则库投入方式。</p></div></label>
+    <label class="drow"><input type="checkbox" data-deck><div class="q"><b>4 · 单篇成本上限与售价模型？</b><p>粗算一篇 ≈ 索引几万 token（便宜模型）+ 正文 5-10 万 token（旗舰模型），按当前 API 价目折算预算，反推模型分工策略。</p></div></label>
+    <label class="drow"><input type="checkbox" data-deck><div class="q"><b>5 · 合规口径怎么定？</b><p>AIGC 检测在收紧。产品定位必须是"辅助初稿 + 待补清单"，用户对内容真实性和学术诚信确认——这影响交互设计，越早定越好。</p></div></label>
+    <label class="drow" style="border-bottom:none"><input type="checkbox" data-deck><div class="q"><b>6 · MVP 的验收标准是什么？</b><p>建议就两条：论文里每个论断能答出"出自代码哪里"；格式脚本检查 100% 通过。两条都立住，架构就立住了。</p></div></label>
+  </div>
+</section>
+
+<section id="gloss">
+  <h2>术语速查表</h2>
+  <p class="h2sub">遇到没见过的词回来查。只收本文档涉及的。</p>
+  <table class="gloss">
+    <tr><th>术语</th><th>大白话</th></tr>
+    <tr><td>LLM / 大模型 API</td><td>现成的 AI 文字生成服务，按 token（约等于 0.7 个汉字）计费，像用水用电一样租用</td></tr>
+    <tr><td>prompt / 提示词</td><td>发给模型的完整输入：指令 + 材料 + 格式要求</td></tr>
+    <tr><td>上下文窗口</td><td>模型一次调用能读的最大长度上限（当前旗舰模型约 20-40 万 token）</td></tr>
+    <tr><td>RAG / 检索增强</td><td>不让模型闭卷瞎猜，先从资料库里检索相关片段、放到提示词里让它开卷答题</td></tr>
+    <tr><td>embedding / 向量库</td><td>把文本转成"语义坐标"，向量库按语义相似度找资料——RAG 的检索手段</td></tr>
+    <tr><td>AST / 语法树</td><td>代码的结构化解析结果，比按行读文本可靠得多，tree-sitter 是主流解析工具</td></tr>
+    <tr><td>结构化输出</td><td>用 API 的 schema 模式强制模型输出规定格式的 JSON，而不是一段自由文本</td></tr>
+    <tr><td>LLM-as-judge</td><td>拿另一个模型当阅卷老师，按检查清单逐条评审产出质量</td></tr>
+    <tr><td>map-reduce</td><td>"先拆后合"：大纲一次生成，逐章分别生成再拼起来，长文标准套路</td></tr>
+    <tr><td>agent 框架</td><td>LangChain/LangGraph 等，帮你把模型调用、循环、状态管理封装起来的开发库</td></tr>
+    <tr><td>golden set / 评估集</td><td>留作回归测试的"标准答案对"，每次改动用它判断质量是升是降</td></tr>
+    <tr><td>docxtpl / 模板引擎</td><td>Word 版的"填空模板"：样式和结构做在模板里，程序只负责往里填内容</td></tr>
+  </table>
+</section>
+
+<footer>
+  本文档为决策支持材料：每步的"业内常见路径"是默认倾向，可推翻；真正的选型取决于决策清单里只有你们知道的变量。<br>
+  配合讨论使用 · 选中的方案与勾选的决策项保存在本机浏览器中。
+</footer>
+
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="sum" id="sum">尚未选择 —— 每一步点一个方案，这里实时汇总你的选型</div>
+    <div class="tip">点击各步骤的方案卡片进行选择，选择会自动保存在本机</div>
+    <button id="copyBtn">复制我的选型</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY='paper-agent-selection-v1', KEY2='paper-agent-deck-v1';
+  var NAMES={1:'仓库摄取',2:'知识构建',3:'格式规格化',4:'规划',5:'生成',6:'校验',7:'渲染'};
+  var sel={}; try{sel=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){sel={}}
+  var deck=[]; try{deck=JSON.parse(localStorage.getItem(KEY2)||'[]')}catch(e){deck=[]}
+
+  function save(){localStorage.setItem(KEY,JSON.stringify(sel))}
+  function saveDeck(){localStorage.setItem(KEY2,JSON.stringify(deck))}
+
+  document.querySelectorAll('.opts').forEach(function(group){
+    var step=group.dataset.step;
+    group.querySelectorAll('.opt').forEach(function(card){
+      card.addEventListener('click',function(){
+        var was=card.classList.contains('selected');
+        group.querySelectorAll('.opt').forEach(function(c){c.classList.remove('selected')});
+        if(!was){card.classList.add('selected');sel[step]=card.dataset.name}
+        else{delete sel[step]}
+        save();render();
+      });
+      if(sel[step]===card.dataset.name)card.classList.add('selected');
+    });
+  });
+
+  document.querySelectorAll('input[data-deck]').forEach(function(cb,i){
+    if(deck.indexOf(i)>-1)cb.checked=true;
+    cb.addEventListener('change',function(){
+      deck=[];
+      document.querySelectorAll('input[data-deck]').forEach(function(c,j){if(c.checked)deck.push(j)});
+      saveDeck();
+    });
+  });
+
+  function render(){
+    var el=document.getElementById('sum');
+    var parts=[];
+    for(var i=1;i<=7;i++){
+      if(sel[i])parts.push('<b>'+i+'·'+NAMES[i]+'</b> '+sel[i]);
+    }
+    if(!parts.length){el.innerHTML='尚未选择 —— 每一步点一个方案，这里实时汇总你的选型';return}
+    el.innerHTML='我的选型：'+parts.join('<i>｜</i>');
+  }
+
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    var lines=['# 论文生成 Agent · 选型记录',''];
+    for(var i=1;i<=7;i++)lines.push(i+'. '+NAMES[i]+(sel[i]?('：'+sel[i]):'：（待定）'));
+    lines.push('');
+    var qs=['1. 目标用户的仓库长什么样','2. 团队技术栈偏 Python 还是别的','3. 先做哪几所学校/专业','4. 单篇成本上限与售价模型','5. 合规口径怎么定','6. MVP 的验收标准'];
+    lines.push('## 决策清单');
+    qs.forEach(function(q,i){lines.push('- ['+(deck.indexOf(i)>-1?'x':' ')+'] '+q)});
+    var text=lines.join('\n');
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ok()},function(){fallback(text)});
+    }else fallback(text);
+    function fallback(t){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();ok()}
+    function ok(){var b=document.getElementById('copyBtn');b.textContent='已复制 ✓';setTimeout(function(){b.textContent='复制我的选型'},1800)}
+  });
+
+  var links=document.querySelectorAll('nav a');
+  var secs=[];
+  links.forEach(function(a){var t=document.querySelector(a.getAttribute('href'));if(t)secs.push({a:a,t:t})});
+  function spy(){
+    var pos=window.scrollY+90,cur=secs[0];
+    secs.forEach(function(s){if(s.t.offsetTop<=pos)cur=s});
+    links.forEach(function(a){a.classList.remove('on')});
+    if(cur)cur.a.classList.add('on');
+  }
+  window.addEventListener('scroll',spy);spy();
+  render();
+})();
+</script>
+</body>
+</html>
